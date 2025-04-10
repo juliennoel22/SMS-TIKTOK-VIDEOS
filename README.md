@@ -1,4 +1,4 @@
-# Remotion video
+# iMessages Videos for TikTok
 
 <p align="center">
   <a href="https://github.com/remotion-dev/logo">
@@ -9,7 +9,13 @@
   </a>
 </p>
 
-Welcome to your Remotion project!
+Welcome to the iMessages Videos project! This tool allows you to generate engaging video messages tailored for TikTok using the power of [Remotion](https://www.remotion.dev/).
+
+## Features
+
+- Create dynamic and visually appealing video messages.
+- Customize content to fit TikTok's format and style.
+- Leverage Remotion's capabilities for seamless video rendering.
 
 ## Commands
 
@@ -25,7 +31,7 @@ npm i
 npm run dev
 ```
 
-**Render video**
+**Render Video**
 
 ```console
 npx remotion render
@@ -37,18 +43,18 @@ npx remotion render
 npx remotion upgrade
 ```
 
-## Docs
+## Documentation
 
-Get started with Remotion by reading the [fundamentals page](https://www.remotion.dev/docs/the-fundamentals).
+Learn how to use this project by exploring the [Remotion fundamentals](https://www.remotion.dev/docs/the-fundamentals).
 
-## Help
+## Support
 
-We provide help on our [Discord server](https://discord.gg/6VzzNDwUwV).
+Need help? Join our [Discord server](https://discord.gg/6VzzNDwUwV) for assistance.
 
 ## Issues
 
-Found an issue with Remotion? [File an issue here](https://github.com/remotion-dev/remotion/issues/new).
+Encountered a problem? [File an issue here](https://github.com/remotion-dev/remotion/issues/new).
 
 ## License
 
-Note that for some entities a company license is needed. [Read the terms here](https://github.com/remotion-dev/remotion/blob/main/LICENSE.md).
+This project may require a company license for certain use cases. [Read the terms here](https://github.com/remotion-dev/remotion/blob/main/LICENSE.md).
