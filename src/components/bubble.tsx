@@ -8,16 +8,18 @@ export const Bubble: React.FC<{ message: string; isSender: boolean }> = ({ messa
         bg-green- 500
         `}>
             <div
-                className={`relative rounded-4xl px-6 py-4 text-5xl ${isSender
-                        ? 'text-white'
-                        : 'text-gray-800'
+                className={`relative rounded-[40px] px-8 py-5 text-5xl text-left ${isSender
+                    ? 'text-white'
+                    : 'text-gray-800'
                     }`}
                 style={{
                     position: 'relative',
                     maxWidth: '750px',
                     background: isSender
-                        ? 'linear-gradient(to bottom, #2b9afd, #0c83fa)'
-                        : '#e8e9eb'
+                        ? 'linear-gradient(to bottom, #4facff, #0c83fa)'
+                        : '#e8e9eb',
+                    fontFamily: 'SF Pro Display, sans-serif', // Apply the sansFrancisco font
+                    fontWeight: 500,
                 }}
             >
                 {message}

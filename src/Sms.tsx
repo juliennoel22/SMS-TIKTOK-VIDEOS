@@ -1,10 +1,10 @@
-import { AbsoluteFill, Sequence } from "remotion";
-import React from "react";
+import { AbsoluteFill, Audio, Sequence, staticFile } from "remotion";
+import React, { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { Background } from "./components/background";
 import { Bubble } from "./components/bubble";
 import { TypingIndicator } from "./components/TypingIndicator";
-import conversation from "../public/conversations/conv-test.json"; // Import JSON file
+import conversation from "../public/conversations/conv1.json"; // Import JSON file
 import { useCurrentFrame, interpolate } from "remotion";
 import reference from "../public/Stock/references/test-reference-imessage.png"; // Import image
 
@@ -17,48 +17,41 @@ const items2 = conversation.messages.map((msg) => ({
   isSender: msg.sender === "user",
 }));
 
-const messageDuration = 60; // Duration for each message animation
+const messageDuration = 80; // Duration for each message animation
+const typingDuration = 80;
 
 // Calculate which message is currently appearing based on frame
 const getCurrentMessageIndex = (frame: number) => {
   return Math.min(Math.floor(frame / messageDuration), items2.length - 1);
 };
 
-const translateAndFadeAnimation = (index: number, frame: number) => {
-  // Calculate how many frames the transition should take (0.5s at 30fps = 15 frames)
+const translateAndFadeAnimation = (index: number, frame: number, isTypingIndicator: boolean = false) => {
   const transitionDuration = 5;
-  const pushUpDelay = 3; // Frames to wait after bubble appears before pushing up previous bubbles
-  const pushUpDuration = 8; // How long the push-up animation takes
-  const pushUpAmount = 22; // How far to push up in pixels
+  const pushUpDelay = 3;
+  const pushUpDuration = 8;
+  const pushUpAmount = isTypingIndicator ? 0 : 22; // Smaller push-up for typing indicator
 
-  // Get current appearing message
   const currentMessageIndex = getCurrentMessageIndex(frame);
 
-  // Calculate progress with ease effect instead of instant appearance
   const progress = interpolate(
     frame,
-    [index * messageDuration, index * messageDuration + transitionDuration],
+    isTypingIndicator
+      ? [index * messageDuration - typingDuration, index * messageDuration]
+      : [index * messageDuration, index * messageDuration + transitionDuration],
     [0, 1],
     {
       extrapolateLeft: "clamp",
       extrapolateRight: "clamp",
-      easing: (t) => {
-        // This implements an ease timing function similar to CSS ease
-        return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-      }
+      easing: (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2),
     }
   );
 
-  // Base transform - slide in from below
   let yOffset = (1 - progress) * 40;
 
-  // Add push-up effect for bubbles above the current message
-  if (index < currentMessageIndex) {
-    // Calculate when push-up should start (after current bubble has appeared)
+  if (index < currentMessageIndex || isTypingIndicator) {
     const pushUpStart = currentMessageIndex * messageDuration + pushUpDelay;
     const pushUpEnd = pushUpStart + pushUpDuration;
 
-    // Calculate push-up progress
     const pushUpProgress = interpolate(
       frame,
       [pushUpStart, pushUpEnd],
@@ -66,11 +59,10 @@ const translateAndFadeAnimation = (index: number, frame: number) => {
       {
         extrapolateLeft: "clamp",
         extrapolateRight: "clamp",
-        easing: (t) => Math.sin((t * Math.PI) / 2), // Smooth start
+        easing: (t) => Math.sin((t * Math.PI) / 2),
       }
     );
 
-    // Apply the push-up effect
     yOffset -= pushUpProgress * pushUpAmount;
   }
 
@@ -78,7 +70,7 @@ const translateAndFadeAnimation = (index: number, frame: number) => {
 
   return {
     transform: transformValue,
-    opacity: progress, // Fade in as it slides
+    opacity: progress,
   };
 };
 
@@ -86,9 +78,25 @@ const isDebugMode = false; // Set to true for debug mode, false for production
 
 export const Sms: React.FC<z.infer<typeof myCompSchema3>> = ({ titleText }) => {
   const frame = useCurrentFrame();
+  const [audioQueue, setAudioQueue] = useState<{ src: string; frame: number }[]>([]);
 
   // Calculate current message index
   const currentMessageIndex = getCurrentMessageIndex(frame);
+
+  // Queue the appropriate audio when a new bubble appears
+  useEffect(() => {
+    if (currentMessageIndex >= 0 && currentMessageIndex < items2.length) {
+      const currentMessage = items2[currentMessageIndex];
+      const audioFile = currentMessage.isSender
+        ? staticFile("sfx/imessage-send.mp3")
+        : staticFile("sfx/imessage-recieve.mp3");
+
+      setAudioQueue((prevQueue) => [
+        ...prevQueue,
+        { src: audioFile, frame: currentMessageIndex * messageDuration },
+      ]);
+    }
+  }, [currentMessageIndex]);
 
   // Calculate if typing indicator should be shown
   const typingDuration = 30; // Duration to show typing indicator before message appears
@@ -115,7 +123,14 @@ export const Sms: React.FC<z.infer<typeof myCompSchema3>> = ({ titleText }) => {
 
   return (
     <AbsoluteFill>
-      {/* <AbsoluteFill>
+      {/* Play queued audio files at the correct frame */}
+      {audioQueue.map((audio, index) => (
+        <Sequence key={`audio-${index}`} from={audio.frame}>
+          <Audio src={audio.src} />
+        </Sequence>
+      ))}
+
+      <AbsoluteFill>
         <Sequence name="Image reférence">
           <img
             src={reference}
@@ -123,12 +138,12 @@ export const Sms: React.FC<z.infer<typeof myCompSchema3>> = ({ titleText }) => {
             style={{
               width: "100%",
               position: "absolute",
-              opacity: 0,
+              opacity: 0.0,
               zIndex: 9999, // Ultra high z-index
             }}
           />
         </Sequence>
-      </AbsoluteFill> */}
+      </AbsoluteFill>
       <AbsoluteFill>
         <Sequence from={0}>
           <Background />
@@ -163,7 +178,7 @@ export const Sms: React.FC<z.infer<typeof myCompSchema3>> = ({ titleText }) => {
               <Sequence
                 from={index * messageDuration}
                 key={`message-${index}`}
-                name = {`message-${index+1}`}
+                name={`message-${index + 1}`}
                 style={{
                   position: "relative",
                   display: "flex",
@@ -195,6 +210,7 @@ export const Sms: React.FC<z.infer<typeof myCompSchema3>> = ({ titleText }) => {
                 {showTypingAfterThisMessage && (
                   <div
                     style={{
+                      ...translateAndFadeAnimation(upcomingMessageIndex, frame, true),
                       position: "relative",
                       display: "flex",
                       flexDirection: "column",
