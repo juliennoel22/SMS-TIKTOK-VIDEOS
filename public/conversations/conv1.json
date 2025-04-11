@@ -1,84 +1,70 @@
 {
+    "botName": "Léa",
     "messages": [
-        {
-            "sender": "user",
-            "text": "On ne peut pas être ensemble, mais je t’aime quand même."
-        },
-        {
-            "sender": "bot",
-            "text": "Pourquoi tu dis ça ?"
-        },
-        {
-            "sender": "user",
-            "text": "C’est compliqué, tu sais."
-        },
-        {
-            "sender": "bot",
-            "text": "Mais pourquoi ? Je comprends pas..."
-        },
-        {
-            "sender": "user",
-            "text": "On appartient à deux mondes différents, c’est risqué."
-        },
-        {
-            "sender": "bot",
-            "text": "Tu penses que l'amour suffit ?"
-        },
-        {
-            "sender": "user",
-            "text": "Parfois, oui. Mais pas cette fois."
-        },
-        {
-            "sender": "bot",
-            "text": "Qu’est-ce qui te fait dire ça ?"
-        },
-        {
-            "sender": "user",
-            "text": "J’ai découvert quelque chose... qu’on peut pas ignorer."
-        },
-        {
-            "sender": "bot",
-            "text": "De quoi tu parles ?"
-        },
-        {
-            "sender": "user",
-            "text": "Je suis déjà avec quelqu’un d'autre."
-        },
-        {
-            "sender": "bot",
-            "text": "T’es sérieux ?"
-        },
-        {
-            "sender": "user",
-            "text": "Je suis désolé. Mais j’ai pas pu m’en empêcher."
-        },
-        {
-            "sender": "bot",
-            "text": "Tu m’as menti depuis le début…"
-        },
-        {
-            "sender": "user",
-            "text": "Non. J’ai juste aimé quelqu’un d’autre. Mais toi aussi, non ?"
-        },
-        {
-            "sender": "bot",
-            "text": "Tu veux dire que tout ça… ça n’a rien changé ?"
-        },
-        {
-            "sender": "user",
-            "text": "Je sais pas. Mais tout ça… c’est plus compliqué que je pensais."
-        },
-        {
-            "sender": "bot",
-            "text": "Alors on laisse tout tomber, juste comme ça ?"
-        },
-        {
-            "sender": "user",
-            "text": "Je crois qu’on doit. Même si on s’aime encore."
-        },
-        {
-            "sender": "bot",
-            "text": "C’est ça… ou alors, on se bat ?"
-        }
+      {
+        "sender": "user",
+        "text": "On ne peut pas être ensemble. C'est trop risqué."
+      },
+      {
+        "sender": "bot",
+        "text": "Tu m'aimes, non ?"
+      },
+      {
+        "sender": "user",
+        "text": "Oui, mais c'est compliqué. On risque trop."
+      },
+      {
+        "sender": "bot",
+        "text": "Tu veux vraiment m’oublier ?"
+      },
+      {
+        "sender": "user",
+        "text": "Non, je t'aime. Mais ça n’a aucun sens."
+      },
+      {
+        "sender": "bot",
+        "text": "Et si je te disais qu’on pouvait tout avoir ?"
+      },
+      {
+        "sender": "user",
+        "text": "Comment ça, tout avoir ?"
+      },
+      {
+        "sender": "bot",
+        "text": "On peut être ensemble. Sans risques."
+      },
+      {
+        "sender": "user",
+        "text": "Mais c’est impossible. On nous sépare !"
+      },
+      {
+        "sender": "bot",
+        "text": "Tu te souviens de ce secret ?"
+      },
+      {
+        "sender": "user",
+        "text": "Non… Quel secret ?"
+      },
+      {
+        "sender": "bot",
+        "text": "Ce qu’on a caché. Ce qu'on peut faire."
+      },
+      {
+        "sender": "user",
+        "text": "Tu as un plan, c’est ça ?"
+      },
+      {
+        "sender": "bot",
+        "text": "On peut tout effacer. Tout recommencer. Ensemble."
+      },
+      {
+        "sender": "user",
+        "text": "Tu es sérieux ?"
+      },
+      {
+        "sender": "bot",
+        "text": "Oui. Mais tu dois choisir maintenant."
+      }
     ]
-}
+  }
+  

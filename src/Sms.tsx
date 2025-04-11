@@ -7,6 +7,7 @@ import { TypingIndicator } from "./components/TypingIndicator";
 import conversation from "../public/conversations/conv1.json"; // Import JSON file
 import { useCurrentFrame, interpolate } from "remotion";
 import reference from "../public/Stock/references/test-reference-imessage.png"; // Import image
+import { TypingInput } from "./components/TypingInput";
 
 export const myCompSchema3 = z.object({
   titleText: z.string(),
@@ -19,6 +20,8 @@ const items2 = conversation.messages.map((msg) => ({
 
 const messageDuration = 80; // Duration for each message animation
 const typingDuration = 80;
+
+const darkTheme = true; // Toggle dark theme
 
 // Calculate which message is currently appearing based on frame
 const getCurrentMessageIndex = (frame: number) => {
@@ -121,6 +124,11 @@ export const Sms: React.FC<z.infer<typeof myCompSchema3>> = ({ titleText }) => {
   const upcomingMessageIndex = shouldShowTypingIndicator();
   const showTypingIndicator = upcomingMessageIndex !== -1;
 
+  const handleSendMessage = (message: string) => {
+    // Add the new message to the conversation
+    items2.push({ message, isSender: true });
+  };
+
   return (
     <AbsoluteFill>
       {/* Play queued audio files at the correct frame */}
@@ -146,7 +154,7 @@ export const Sms: React.FC<z.infer<typeof myCompSchema3>> = ({ titleText }) => {
       </AbsoluteFill>
       <AbsoluteFill>
         <Sequence from={0}>
-          <Background />
+          <Background darkTheme={darkTheme} />
         </Sequence>
       </AbsoluteFill>
 
@@ -155,8 +163,8 @@ export const Sms: React.FC<z.infer<typeof myCompSchema3>> = ({ titleText }) => {
           display: "flex",
           flexDirection: "column",
           justifyContent: "flex-end",
-          backgroundColor: isDebugMode ? "green" : "transparent", // Green background in debug mode
-          paddingBottom: "150px", // Adjust bottom margin to raise the sequence
+          backgroundColor: darkTheme ? "#000" : "transparent", // Adjust background for dark theme
+          paddingBottom: "0px", // Remove extra padding to align with input
         }}
       >
         <div
@@ -164,7 +172,7 @@ export const Sms: React.FC<z.infer<typeof myCompSchema3>> = ({ titleText }) => {
             display: "flex",
             flexDirection: "column",
             alignItems: "flex-start",
-            backgroundColor: isDebugMode ? "red" : "transparent", // Red background in debug mode
+            paddingBottom: "150px", // Adjust bottom margin to raise the sequence
           }}
         >
           {/* Messages with typing indicator placed dynamically */}
@@ -189,10 +197,9 @@ export const Sms: React.FC<z.infer<typeof myCompSchema3>> = ({ titleText }) => {
                 <div
                   style={{
                     ...translateAndFadeAnimation(index, frame),
-                    backgroundColor: isDebugMode ? "yellow" : "transparent", // Yellow background in debug mode
                   }}
                 >
-                  <Bubble message={item.message} isSender={item.isSender} />
+                  <Bubble message={item.message} isSender={item.isSender} darkTheme={darkTheme} />
                 </div>
               </Sequence>
             );
@@ -218,15 +225,23 @@ export const Sms: React.FC<z.infer<typeof myCompSchema3>> = ({ titleText }) => {
                       marginBottom: "10px",
                     }}
                   >
-                    <TypingIndicator />
+                    <TypingIndicator darkTheme={darkTheme} />
                   </div>
                 )}
               </React.Fragment>
             );
           })}
         </div>
+        <div
+          style={{
+            position: "absolute",
+            bottom: 0,
+            width: "100%",
+          }}
+        >
+          <TypingInput onSend={handleSendMessage} darkTheme={darkTheme} />
+        </div>
       </AbsoluteFill>
-
     </AbsoluteFill>
   );
 };

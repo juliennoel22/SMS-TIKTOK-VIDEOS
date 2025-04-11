@@ -1,7 +1,7 @@
 import React from 'react';
 import { useCurrentFrame, interpolate } from 'remotion';
 
-export const TypingIndicator: React.FC = () => {
+export const TypingIndicator: React.FC<{ darkTheme: boolean }> = ({ darkTheme }) => {
     const frame = useCurrentFrame();
     // Add a size scaling factor to adjust overall size
     const sizeFactor = 1.2; // Default is 1.0, increase or decrease to scale everything
@@ -56,11 +56,12 @@ export const TypingIndicator: React.FC = () => {
     return (
         <div className="flex justify-start w-full">
             <div
-                className="bg-[#e8e9eb] text-gray-800 rounded-full px-6 py-5"
+                className="rounded-full px-6 py-5"
                 style={{
                     position: 'relative',
                     maxWidth: `${150 * sizeFactor}px`,
-                    padding: `${32 * sizeFactor}px ${40 * sizeFactor}px`
+                    padding: `${32 * sizeFactor}px ${40 * sizeFactor}px`,
+                    backgroundColor: darkTheme ? "#222" : "#e8e9eb",
                 }}
             >
                 <div className={`flex space-x-2`}>
@@ -71,7 +72,7 @@ export const TypingIndicator: React.FC = () => {
                                 width: `${16 * sizeFactor}px`,
                                 height: `${16 * sizeFactor}px`,
                                 borderRadius: '50%',
-                                backgroundColor: '#888',
+                                backgroundColor: darkTheme ? "#bbb" : "#888",
                                 ...getAnimationStyle(i),
                             }}
                         />
