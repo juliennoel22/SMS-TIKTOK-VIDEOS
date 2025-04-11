@@ -16,6 +16,11 @@
             "delay": 60
         },
         {
+            "sender": "bot",
+            "text": "Go tout pétax !",
+            "delay": 60
+        },
+        {
             "sender": "user",
             "text": "Je fais 5 reps max, mais je stagne depuis un moment.",
             "delay": 30

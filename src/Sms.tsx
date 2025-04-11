@@ -10,17 +10,6 @@ export const myCompSchema3 = z.object({
   titleText: z.string(),
 });
 
-const items = [
-  { message: 'Julien', isSender: true },
-  { message: 'CEO', isSender: false },
-  { message: 'Callisthénie', isSender: true },
-  { message: 'Callisthénie 2', isSender: true },
-  { message: 'test message méga long de fou on va voir ce que ca fonne si j\'aicris ca ', isSender: false },
-  { message: 'test', isSender: false },
-  { message: 'test', isSender: false },
-  { message: 'test', isSender: false },
-];
-
 const items2 = conversation.messages.map((msg) => ({
   message: msg.text,
   isSender: msg.sender === "user",
@@ -47,7 +36,6 @@ export const Sms: React.FC<z.infer<typeof myCompSchema3>> = ({ titleText }) => {
 
   return (
     <AbsoluteFill>
-
       <AbsoluteFill>
         <Sequence from={0}>
           <Background />
@@ -72,9 +60,18 @@ export const Sms: React.FC<z.infer<typeof myCompSchema3>> = ({ titleText }) => {
           }}
         >
           {items2.map((item, index) => {
-            const isSameSender =
-              index > 0 && items2[index].isSender === items2[index - 1].isSender;
-            const gap = isSameSender ? "30px" : "3px"; // Smaller gap for same sender, larger for different senders
+            const isNextSenderSame =
+              index < items2.length - 1 && items2[index].isSender === items2[index + 1].isSender;
+            const gap = isNextSenderSame ? "3px" : "30px"; // Smaller gap for same sender, larger for different senders
+            if (frame === index * messageDuration) {
+              console.log(`Message index: ${index}`);
+              console.log(`Current sender: ${items2[index].isSender}`);
+              if (index > 0) {
+              console.log(`Previous sender: ${items2[index - 1].isSender}`);
+              }
+              console.log(`Is same sender: ${isNextSenderSame}`);
+              console.log(`Gap: ${gap}`);
+            }
 
             return (
               <Sequence
@@ -91,6 +88,7 @@ export const Sms: React.FC<z.infer<typeof myCompSchema3>> = ({ titleText }) => {
                   style={{
                     ...translateAndFadeAnimation(index, frame),
                     transition: "transform 0.5s ease, opacity 0.5s ease",
+                    backgroundColor: isDebugMode ? "yellow" : "transparent", // Yellow background in debug mode
                   }}
                 >
                   <Bubble message={item.message} isSender={item.isSender} />
@@ -107,7 +105,6 @@ export const Sms: React.FC<z.infer<typeof myCompSchema3>> = ({ titleText }) => {
             alt="background"
             style={{
               width: "100%",
-              // height: "100%",
               position: "absolute",
               opacity: 0.0,
               zIndex: 9999, // Ultra high z-index
