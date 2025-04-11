@@ -9,10 +9,16 @@ export const Bubble: React.FC<{ message: string; isSender: boolean }> = ({ messa
         `}>
             <div
                 className={`relative rounded-4xl px-6 py-4 text-5xl ${isSender
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-gray-200 text-gray-800'
+                        ? 'text-white'
+                        : 'text-gray-800'
                     }`}
-                style={{ position: 'relative', maxWidth: '750px'  }}
+                style={{
+                    position: 'relative',
+                    maxWidth: '750px',
+                    background: isSender
+                        ? 'linear-gradient(to bottom, #2b9afd, #0c83fa)'
+                        : '#e8e9eb'
+                }}
             >
                 {message}
             </div>
