@@ -1,0 +1,94 @@
+{
+    "messages": [
+        {
+            "sender": "user",
+            "text": "Salut Coach, j’ai du mal à progresser en traction.",
+            "delay": 0
+        },
+        {
+            "sender": "user",
+            "text": "Tu aurais des conseils pour m’aider à m’améliorer ?",
+            "delay": 15
+        },
+        {
+            "sender": "bot",
+            "text": "T’inquiète, on va corriger ça ensemble. Tu fais combien de reps max ?",
+            "delay": 60
+        },
+        {
+            "sender": "user",
+            "text": "Je fais 5 reps max, mais je stagne depuis un moment.",
+            "delay": 30
+        },
+        {
+            "sender": "bot",
+            "text": "C’est déjà un bon début ! On va travailler sur ta force et ta technique. Tu t’échauffes bien avant de commencer ?",
+            "delay": 60
+        },
+        {
+            "sender": "user",
+            "text": "Pas vraiment, je fais juste quelques tractions pour m’échauffer.",
+            "delay": 30
+        },
+        {
+            "sender": "bot",
+            "text": "OK, on va améliorer ça. Un bon échauffement est essentiel. Je te conseille de faire des exercices d’échauffement pour les épaules et les bras avant de commencer.",
+            "delay": 60
+        },
+        {
+            "sender": "user",
+            "text": "D’accord, je vais essayer. Et pour progresser, tu me conseilles quoi ?",
+            "delay": 30
+        },
+        {
+            "sender": "bot",
+            "text": "Pour progresser, tu peux essayer les tractions négatives et les tractions assistées. Ça t’aidera à renforcer tes muscles.",
+            "delay": 60
+        },
+        {
+            "sender": "bot",
+            "text": "Aussi, pense à augmenter progressivement l’intensité de tes séances.",
+            "delay": 30
+        },
+        {
+            "sender": "user",
+            "text": "Les tractions négatives, c’est quoi exactement ?",
+            "delay": 30
+        },
+        {
+            "sender": "bot",
+            "text": "C’est simple : tu commences en haut de la barre, puis tu descends lentement. Ça travaille bien la force.",
+            "delay": 60
+        },
+        {
+            "sender": "bot",
+            "text": "Tu peux utiliser une chaise ou un support pour te hisser en haut si besoin.",
+            "delay": 30
+        },
+        {
+            "sender": "user",
+            "text": "Ah d’accord, je vais essayer ça. Et les tractions assistées, c’est avec un élastique ?",
+            "delay": 30
+        },
+        {
+            "sender": "bot",
+            "text": "Exactement ! Un élastique peut réduire la charge et t’aider à faire plus de répétitions.",
+            "delay": 60
+        },
+        {
+            "sender": "user",
+            "text": "Super, merci pour les conseils ! Je vais m’y mettre dès demain.",
+            "delay": 30
+        },
+        {
+            "sender": "bot",
+            "text": "Avec plaisir ! N’oublie pas de bien te reposer entre les séances pour laisser tes muscles récupérer.",
+            "delay": 60
+        },
+        {
+            "sender": "bot",
+            "text": "Et tiens-moi au courant de tes progrès, je suis là pour t’aider !",
+            "delay": 30
+        }
+    ]
+}

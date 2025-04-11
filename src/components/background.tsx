@@ -1,5 +1,3 @@
-import "../../public/styles/messages.css"; // Import CSS for global styles
-
 // Import images
 import topIcons from "../../public/images/top-icons.png";
 import arrow from "../../public/images/arrow.png";
@@ -9,8 +7,8 @@ import arrowGrey from "../../public/images/arrow_grey.png";
 
 export const Background: React.FC = () => {
   return (
-    <div id="big_container" className="flex justify-center bg-green-500 w-full h-full">
-      <div id="screen" className="relative bg-red-500 w-[1080px] h-[1920px] flex flex-col rounded-4xl shadow-lg">
+    <div id="big_container" className="flex justify-center bg-white w-full h-full">
+      <div id="screen" className="relative bg-red- w-[1080px] h-[1920px] flex flex-col rounded-4xl shadow-lg">
         {/* Header Section */}
         <div id="header" className="bg-gray-200 border-b border-gray-900 rounded-t-4xl z-10">
           <div id="before-top" className="flex justify-between text-black font-semibold text-lg px-16 py-8">
