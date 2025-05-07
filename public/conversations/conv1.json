@@ -1,70 +1,76 @@
 {
-    "botName": "Léa",
-    "messages": [
-      {
-        "sender": "user",
-        "text": "On ne peut pas être ensemble. C'est trop risqué."
-      },
-      {
-        "sender": "bot",
-        "text": "Tu m'aimes, non ?"
-      },
-      {
-        "sender": "user",
-        "text": "Oui, mais c'est compliqué. On risque trop."
-      },
-      {
-        "sender": "bot",
-        "text": "Tu veux vraiment m’oublier ?"
-      },
-      {
-        "sender": "user",
-        "text": "Non, je t'aime. Mais ça n’a aucun sens."
-      },
-      {
-        "sender": "bot",
-        "text": "Et si je te disais qu’on pouvait tout avoir ?"
-      },
-      {
-        "sender": "user",
-        "text": "Comment ça, tout avoir ?"
-      },
-      {
-        "sender": "bot",
-        "text": "On peut être ensemble. Sans risques."
-      },
-      {
-        "sender": "user",
-        "text": "Mais c’est impossible. On nous sépare !"
-      },
-      {
-        "sender": "bot",
-        "text": "Tu te souviens de ce secret ?"
-      },
-      {
-        "sender": "user",
-        "text": "Non… Quel secret ?"
-      },
-      {
-        "sender": "bot",
-        "text": "Ce qu’on a caché. Ce qu'on peut faire."
-      },
-      {
-        "sender": "user",
-        "text": "Tu as un plan, c’est ça ?"
-      },
-      {
-        "sender": "bot",
-        "text": "On peut tout effacer. Tout recommencer. Ensemble."
-      },
-      {
-        "sender": "user",
-        "text": "Tu es sérieux ?"
-      },
-      {
-        "sender": "bot",
-        "text": "Oui. Mais tu dois choisir maintenant."
-      }
-    ]
-  }
-  
+  "botName": "Tom",
+  "gender": "male",
+  "hook": "POV : Mon mec me ments depuis le début...",
+  "CTA": "Je fais quoi ?\n Aidez-moi !",
+  "messages": [
+    {
+      "sender": "user",
+      "text": "On doit parler."
+    },
+    {
+      "sender": "bot",
+      "text": "Att, de quoi tu parles là ?"
+    },
+    {
+      "sender": "user",
+      "text": "Je sais ce que t'as fait… avec elle."
+    },
+    {
+      "sender": "bot",
+      "text": "Quoi ? T’es sérieux là ?!"
+    },
+    {
+      "sender": "user",
+      "text": "Franchement… fallait pas me mentir."
+    },
+    {
+      "sender": "bot",
+      "text": "Mais je… Attends, tu sais quoi exactement ?"
+    },
+    {
+      "sender": "user",
+      "text": "Je sais tout. Et tu pensais que j'avais pas vu ?"
+    },
+    {
+      "sender": "bot",
+      "text": "Non… NON, attends. C’est pas ce que tu crois."
+    },
+    {
+      "sender": "user",
+      "text": "Franchement… fallait pas me mentir."
+    },
+    {
+      "sender": "bot",
+      "text": "...C’est pas toi que j’aimais."
+    },
+    {
+      "sender": "user",
+      "text": "...Quoi ?"
+    },
+    {
+      "sender": "bot",
+      "text": "Je t’ai jamais dit que c’était toi."
+    },
+    {
+      "sender": "user",
+      "text": "Tu… T’es sérieux là ?"
+    },
+    {
+      "sender": "bot",
+      "text": "Je voulais juste te protéger."
+    },
+    {
+      "sender": "user",
+      "text": "Protéger de quoi ?"
+    },
+    {
+      "sender": "bot",
+      "text": "De la vérité."
+    },
+    {
+      "sender": "user",
+      "text": "Mais...\ntu ne peux pas me laiseer comme ca..."
+    }
+  ]
+}

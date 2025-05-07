@@ -1,14 +1,13 @@
 import "./index.css";
 import { Composition } from "remotion";
-import { Sms, myCompSchema3 } from "./Sms";
+import { Sms, myCompSchema3, messageDuration, initialDelay } from "./Sms";
 import { Test } from "./Test";
 import conversation from "../public/conversations/conv1.json"; // Import conversation data
 
-// Calculate total duration based on the number of messages and messageDuration
-const messageDuration = 80; // Match the value in Sms.tsx
 const typingDuration = 80; // Match the value in Sms.tsx
 const totalMessages = conversation.messages.length;
-const totalDuration = totalMessages * messageDuration + typingDuration;
+// Utilise les valeurs importées pour la durée totale
+const totalDuration = totalMessages * messageDuration + typingDuration + 30 / 2 * totalMessages + initialDelay * 2;
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -23,6 +22,9 @@ export const RemotionRoot: React.FC = () => {
         schema={myCompSchema3}
         defaultProps={{
           titleText: "Welcome to Remotion",
+          userGender: "male", // ou "female"
+          botGender: conversation.gender === "female" ? "female" : "male",
+          run: true, // Added the required 'run' property
         }}
       />
       <Composition

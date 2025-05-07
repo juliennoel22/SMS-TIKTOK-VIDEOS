@@ -1,0 +1,32 @@
+[
+  {
+    "id": "video1",
+    "title": "Conversation 1",
+    "filePath": "../public/conversations/conv1.json",
+    "durationInFrames": 300,
+    "fps": 30,
+    "width": 1080,
+    "height": 1920,
+    "defaultProps": {
+      "titleText": "Conversation 1",
+      "userGender": "male",
+      "botGender": "female",
+      "run": true
+    }
+  },
+  {
+    "id": "video2",
+    "title": "Conversation 2",
+    "filePath": "../public/conversations/conv2.json",
+    "durationInFrames": 400,
+    "fps": 30,
+    "width": 1080,
+    "height": 1920,
+    "defaultProps": {
+      "titleText": "Conversation 2",
+      "userGender": "female",
+      "botGender": "male",
+      "run": true
+    }
+  }
+]

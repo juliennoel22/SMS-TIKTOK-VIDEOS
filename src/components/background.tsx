@@ -1,7 +1,8 @@
 // Import images
 import topIcons from "../../public/images/top-icons.png";
 import arrow from "../../public/images/arrow.png";
-import profilePicture from "../../public/images/fille_pdp.png";
+import profilePicture_female from "../../public/images/fille_pdp.png";
+import profilePicture_male from "../../public/images/garcon.png";
 import camera from "../../public/images/camera.png";
 import arrowGrey from "../../public/images/arrow_grey.png";
 import conversation from "../../public/conversations/conv1.json"; // Import JSON file
@@ -18,7 +19,7 @@ export const Background: React.FC<{ darkTheme: boolean }> = ({ darkTheme }) => {
         className={`relative w-[1080px] h-[1920px] flex flex-col rounded-4xl shadow-lg overflow-hidden ${darkTheme ? "bg-gray-900" : "bg-white"
           }`}
       >
-        {/* Dedicated Blur Layer */}
+        {/* Dedicated Blur Layer
         <div
           id="blur_container"
           className="absolute inset-0 overflow-hidden"
@@ -44,30 +45,34 @@ export const Background: React.FC<{ darkTheme: boolean }> = ({ darkTheme }) => {
 
             }}
           ></div>
-        </div>
+        </div> */}
 
         {/* Main Header Section */}
         <div id="header"
           className="relative border-b border-gray-500 rounded-t-4xl z-10"
           style={{
-            backgroundColor: darkTheme ? "rgba(30, 30, 30, 0.85)" : "rgba(230, 230, 230, 1.65)",
+            backgroundColor: darkTheme ? "rgba(30, 30, 30, 1.65)" : "rgba(230, 230, 230, 1.65)",
           }}
         >
           <div id="before-top" className="flex justify-between text-black font-semibold text-lg px-24 py-12 pr-16">
             <div className={`top-left text-5xl ${darkTheme ? "text-white" : "text-black"}`}>23:04</div>
             <div className="top-right">
               <img
-              src={topIcons}
-              alt="Top Icons"
-              className={`h-8 ${darkTheme ? "filter invert" : ""}`}
+                src={topIcons}
+                alt="Top Icons"
+                className={`h-8 ${darkTheme ? "filter invert" : ""}`}
               />
             </div>
           </div>
-          <div className="px-16 flex justify-between items-end">
+            <div className="px-16 flex justify-between items-end">
             <img src={arrow} alt="Back Arrow" className="h-15 " />
-            <img src={profilePicture} alt="Profile Picture " className="ml-5 h-36 rounded-full" />
+            <img
+              src={conversation.gender === "male" ? profilePicture_male : profilePicture_female}
+              alt="Profile Picture"
+              className="ml-5 h-36 rounded-full"
+            />
             <img src={camera} alt="Camera Icon" className="h-12" />
-          </div>
+            </div>
           <div id="name" className={`flex justify-center items-center ${darkTheme ? "text-gray-300" : "text-gray-700"
             } text-3xl font-light mt-4 mb-8`}>
             <p className="font-bold">{conversation.botName}</p>
@@ -76,7 +81,7 @@ export const Background: React.FC<{ darkTheme: boolean }> = ({ darkTheme }) => {
         </div>
 
         {/* Home Bar */}
-        <div id="home_bar" className="absolute bg-black h-3 w-1/3 bottom-8 left-1/2 transform -translate-x-1/2 rounded-full"></div>
+        <div id="home_bar" className={`absolute h-3 w-1/3 bottom-8 left-1/2 transform -translate-x-1/2 rounded-full z-1000 ${darkTheme ? "bg-white" : "bg-black"}`}></div>
       </div>
     </div>
   );

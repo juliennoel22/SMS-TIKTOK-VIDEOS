@@ -1,0 +1,143 @@
+{
+  "botName": "Pote",
+  "gender": "female",
+  "hook": "POV : T’as fouillé son tel et t’aurais jamais dû.",
+  "messages": [
+    {
+      "sender": "user",
+      "text": "gros…"
+    },
+    {
+      "sender": "user",
+      "text": "j’ai fouillé son tel hier soir"
+    },
+    {
+      "sender": "bot",
+      "text": "😭 ptdrrr t’as osé"
+    },
+    {
+      "sender": "user",
+      "text": "j’me sentais chelou"
+    },
+    {
+      "sender": "user",
+      "text": "y’avait trop de trucs bizarres"
+    },
+    {
+      "sender": "bot",
+      "text": "et ??"
+    },
+    {
+      "sender": "bot",
+      "text": "t’as vu quoi ?? 😭"
+    },
+    {
+      "sender": "user",
+      "text": "y’a une convo avec \"Camille 🧡\""
+    },
+    {
+      "sender": "user",
+      "text": "c’est pas sa sœur hein"
+    },
+    {
+      "sender": "bot",
+      "text": "att c’est QUI alors 😭"
+    },
+    {
+      "sender": "bot",
+      "text": "explique là"
+    },
+    {
+      "sender": "user",
+      "text": "ça parle de"
+    },
+    {
+      "sender": "user",
+      "text": "\"j’ai hâte qu’elle découvre rien\""
+    },
+    {
+      "sender": "user",
+      "text": "\"encore qq semaines et c’est bon\""
+    },
+    {
+      "sender": "bot",
+      "text": "????"
+    },
+    {
+      "sender": "bot",
+      "text": "quoi 😭😭"
+    },
+    {
+      "sender": "bot",
+      "text": "il fait quoi"
+    },
+    {
+      "sender": "user",
+      "text": "j’ai screen j’te jure"
+    },
+    {
+      "sender": "user",
+      "text": "il a une double vie frère"
+    },
+    {
+      "sender": "bot",
+      "text": "non mais genre"
+    },
+    {
+      "sender": "bot",
+      "text": "il te trompe ??"
+    },
+    {
+      "sender": "user",
+      "text": "non pire"
+    },
+    {
+      "sender": "user",
+      "text": "il parle avec elle comme si…"
+    },
+    {
+      "sender": "bot",
+      "text": "COMME SI QUOI 😭😭😭"
+    },
+    {
+      "sender": "user",
+      "text": "comme si c’était moi."
+    },
+    {
+      "sender": "user",
+      "text": "genre"
+    },
+    {
+      "sender": "user",
+      "text": "mêmes emojis"
+    },
+    {
+      "sender": "user",
+      "text": "mêmes surnoms"
+    },
+    {
+      "sender": "user",
+      "text": "mêmes phrases."
+    },
+    {
+      "sender": "bot",
+      "text": "attends mais"
+    },
+    {
+      "sender": "bot",
+      "text": "tu sors peut-être pas avec lui"
+    },
+    {
+      "sender": "user",
+      "text": "…"
+    },
+    {
+      "sender": "bot",
+      "text": "peut-être que t’es *Camille 🧡*"
+    },
+    {
+      "sender": "bot",
+      "text": "et tu le sais pas."
+    }
+  ]
+}

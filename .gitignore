@@ -12,3 +12,5 @@ out
 *.env.test
 *.env.production
 *.csv
+/videos_export
+/videos
