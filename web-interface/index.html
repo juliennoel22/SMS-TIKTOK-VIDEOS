@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur de Vidéos iMessages - Interface Web</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .phone-preview {
+            background: linear-gradient(180deg, #000 0%, #1a1a1a 100%);
+            border-radius: 25px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .message-user {
+            background: #0c83fa;
+            color: white;
+            margin-left: auto;
+            border-radius: 18px 18px 4px 18px;
+        }
+
+        .message-bot {
+            background: #e8e9eb;
+            color: #000;
+            border-radius: 18px 18px 18px 4px;
+        }
+
+        .dark-theme .message-bot {
+            background: #333;
+            color: #fff;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <div x-data="videoGenerator()" class="min-h-screen">
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center py-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z" />
+                            </svg>
+                        </div>
+                        <h1 class="text-xl font-semibold text-gray-900">Générateur de Vidéos iMessages</h1>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <button @click="generateVideo()" :disabled="loading || conversation.messages.length === 0"
+                            :class="loading || conversation.messages.length === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'"
+                            class="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium transition-colors">
+                            <span x-show="!loading">🎬 Générer la Vidéo</span>
+                            <span x-show="loading" class="flex items-center">
+                                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                        stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor"
+                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                    </path>
+                                </svg>
+                                Génération...
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Panneau de configuration -->
+                <div class="space-y-6">
+                    <!-- Configuration générale -->
+                    <div class="bg-white rounded-xl shadow-sm p-6">
+                        <h2 class="text-lg font-semibold text-gray-900 mb-4">Configuration de la conversation</h2>
+
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Nom du bot</label>
+                                <input x-model="conversation.botName" type="text" placeholder="ex: Tom, Sarah, Alex..."
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Genre du bot</label>
+                                <select x-model="conversation.gender"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    <option value="male">Masculin</option>
+                                    <option value="female">Féminin</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Hook d'accroche</label>
+                                <textarea x-model="conversation.hook" rows="2"
+                                    placeholder="POV : Il m'a dit que c'était juste une collègue..."
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"></textarea>
+                                <p class="text-xs text-gray-500 mt-1">Phrase d'accroche qui apparaît au début de la
+                                    vidéo</p>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Call-to-Action (CTA)</label>
+                                <textarea x-model="conversation.CTA" rows="2" placeholder="Je fais quoi ?\nAidez moi !"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"></textarea>
+                                <p class="text-xs text-gray-500 mt-1">Question finale pour encourager les commentaires
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Configuration vidéo -->
+                    <div class="bg-white rounded-xl shadow-sm p-6">
+                        <h2 class="text-lg font-semibold text-gray-900 mb-4">Paramètres vidéo</h2>
+
+                        <div class="space-y-4">
+                            <div>
+                                <label class="flex items-center">
+                                    <input x-model="settings.darkTheme" type="checkbox"
+                                        class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                    <span class="ml-2 text-sm text-gray-700">Thème sombre</span>
+                                </label>
+                            </div>
+
+                            <div>
+                                <label class="flex items-center">
+                                    <input x-model="settings.showTypingInputBar" type="checkbox"
+                                        class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                    <span class="ml-2 text-sm text-gray-700">Afficher la barre de saisie</span>
+                                </label>
+                            </div>
+
+                            <div>
+                                <label class="flex items-center">
+                                    <input x-model="settings.enableAudioGeneration" type="checkbox"
+                                        class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                    <span class="ml-2 text-sm text-gray-700">Générer l'audio automatiquement</span>
+                                </label>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Durée par message
+                                    (frames)</label>
+                                <input x-model.number="settings.messageDuration" type="number" min="30" max="120"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <p class="text-xs text-gray-500 mt-1">60 frames = 2 secondes (30fps)</p>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Délai initial
+                                    (frames)</label>
+                                <input x-model.number="settings.initialDelay" type="number" min="60" max="300"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <p class="text-xs text-gray-500 mt-1">120 frames = 4 secondes avant le premier message
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Messages -->
+                    <div class="bg-white rounded-xl shadow-sm p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-lg font-semibold text-gray-900">Messages</h2>
+                            <button @click="addMessage()"
+                                class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                                + Ajouter un message
+                            </button>
+                        </div>
+
+                        <div class="space-y-3">
+                            <template x-for="(message, index) in conversation.messages" :key="index">
+                                <div class="border border-gray-200 rounded-lg p-4">
+                                    <div class="flex justify-between items-start mb-3">
+                                        <select x-model="message.sender"
+                                            class="px-3 py-1 border border-gray-300 rounded text-sm">
+                                            <option value="user">👤 Utilisateur</option>
+                                            <option value="bot" x-text="'🤖 ' + (conversation.botName || 'Bot')">🤖 Bot
+                                            </option>
+                                        </select>
+                                        <button @click="removeMessage(index)"
+                                            class="text-red-500 hover:text-red-700 text-sm">
+                                            🗑️ Supprimer
+                                        </button>
+                                    </div>
+                                    <textarea x-model="message.text" rows="2" placeholder="Tapez votre message..."
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"></textarea>
+                                </div>
+                            </template>
+
+                            <div x-show="conversation.messages.length === 0" class="text-center py-8 text-gray-500">
+                                <p>Aucun message ajouté.</p>
+                                <p class="text-sm">Cliquez sur "Ajouter un message" pour commencer.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="bg-white rounded-xl shadow-sm p-6">
+                        <h2 class="text-lg font-semibold text-gray-900 mb-4">Actions</h2>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <button @click="loadPreset('jalousie')"
+                                class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-3 rounded-lg text-sm font-medium transition-colors">
+                                📱 Preset "Jalousie"
+                            </button>
+                            <button @click="loadPreset('mensonge')"
+                                class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-3 rounded-lg text-sm font-medium transition-colors">
+                                🤥 Preset "Mensonge"
+                            </button>
+                            <button @click="exportJSON()"
+                                class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-3 rounded-lg text-sm font-medium transition-colors">
+                                💾 Exporter JSON
+                            </button>
+                            <button @click="importJSON()"
+                                class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-lg text-sm font-medium transition-colors">
+                                📂 Importer JSON
+                            </button>
+                        </div>
+
+                        <input type="file" x-ref="fileInput" @change="handleFileImport($event)" accept=".json"
+                            class="hidden">
+                    </div>
+                </div>
+
+                <!-- Aperçu du téléphone -->
+                <div class="sticky top-8">
+                    <div class="bg-white rounded-xl shadow-sm p-6">
+                        <h2 class="text-lg font-semibold text-gray-900 mb-4">Aperçu</h2>
+
+                        <!-- Simulation iPhone -->
+                        <div class="phone-preview mx-auto" style="width: 320px; height: 600px; position: relative;">
+                            <!-- Status bar -->
+                            <div class="flex justify-between items-center px-6 py-3 text-white text-sm">
+                                <span>9:41</span>
+                                <div class="flex items-center space-x-1">
+                                    <div class="w-4 h-2 border border-white rounded-sm">
+                                        <div class="w-3 h-1 bg-green-500 rounded-sm"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Header conversation -->
+                            <div class="bg-gray-800 px-4 py-3 border-b border-gray-700">
+                                <div class="flex items-center space-x-3">
+                                    <div
+                                        class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-semibold">
+                                        <span
+                                            x-text="conversation.botName ? conversation.botName.charAt(0).toUpperCase() : 'B'">B</span>
+                                    </div>
+                                    <div>
+                                        <p class="text-white font-medium text-sm"
+                                            x-text="conversation.botName || 'Bot'">Bot</p>
+                                        <p class="text-gray-400 text-xs">en ligne</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Hook -->
+                            <div x-show="conversation.hook" class="absolute top-1/4 left-4 right-4 z-10">
+                                <div class="bg-black bg-opacity-90 rounded-lg p-3 text-center">
+                                    <p class="text-white text-sm font-semibold" x-text="conversation.hook"></p>
+                                </div>
+                            </div>
+
+                            <!-- Messages area -->
+                            <div class="flex-1 overflow-y-auto px-4 py-4 space-y-2"
+                                :class="settings.darkTheme ? 'dark-theme bg-black' : 'bg-white'" style="height: 400px;">
+                                <template x-for="(message, index) in conversation.messages" :key="index">
+                                    <div class="fade-in"
+                                        :class="message.sender === 'user' ? 'flex justify-end' : 'flex justify-start'">
+                                        <div class="max-w-xs px-3 py-2 text-sm"
+                                            :class="message.sender === 'user' ? 'message-user' : 'message-bot'"
+                                            x-text="message.text">
+                                        </div>
+                                    </div>
+                                </template>
+
+                                <div x-show="conversation.messages.length === 0"
+                                    class="text-center py-12 text-gray-400">
+                                    <p class="text-sm">Aucun message à afficher</p>
+                                </div>
+                            </div>
+
+                            <!-- CTA -->
+                            <div x-show="conversation.CTA" class="absolute bottom-16 left-4 right-4">
+                                <div class="bg-red-500 rounded-lg p-3 text-center">
+                                    <p class="text-white text-sm font-bold" x-text="conversation.CTA"></p>
+                                </div>
+                            </div>
+
+                            <!-- Input bar -->
+                            <div class="absolute bottom-0 left-0 right-0 bg-gray-800 p-3 rounded-b-3xl">
+                                <div class="bg-gray-700 rounded-full px-4 py-2">
+                                    <p class="text-gray-400 text-sm">iMessage</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Statistiques -->
+                        <div class="mt-6 grid grid-cols-2 gap-4 text-center">
+                            <div class="bg-gray-50 rounded-lg p-3">
+                                <p class="text-2xl font-bold text-gray-900" x-text="conversation.messages.length">0</p>
+                                <p class="text-sm text-gray-600">Messages</p>
+                            </div>
+                            <div class="bg-gray-50 rounded-lg p-3">
+                                <p class="text-2xl font-bold text-gray-900" x-text="estimatedDuration">0s</p>
+                                <p class="text-sm text-gray-600">Durée estimée</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast notifications -->
+        <div x-show="showToast" x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 transform translate-y-2"
+            x-transition:enter-end="opacity-100 transform translate-y-0"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100 transform translate-y-0"
+            x-transition:leave-end="opacity-0 transform translate-y-2"
+            class="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50">
+            <p x-text="toastMessage"></p>
+        </div>
+    </div>
+
+    <script>
+        function videoGenerator() {
+            return {
+                loading: false,
+                showToast: false,
+                toastMessage: '',
+
+                conversation: {
+                    botName: 'Tom',
+                    gender: 'male',
+                    hook: 'POV : Il m\'a dit que c\'était "juste une collègue"…',
+                    CTA: 'Je fais quoi ?\nAidez moi !',
+                    messages: [
+                        {
+                            sender: 'user',
+                            text: 'C\'est qui Jennifer ?'
+                        },
+                        {
+                            sender: 'bot',
+                            text: 'Tu parles de Jenny ? Ma collègue ?'
+                        }
+                    ]
+                },
+
+                settings: {
+                    darkTheme: false,
+                    showTypingInputBar: false,
+                    enableAudioGeneration: true,
+                    messageDuration: 60,
+                    initialDelay: 120
+                },
+
+                get estimatedDuration() {
+                    const totalMessages = this.conversation.messages.length;
+                    const totalFrames = (totalMessages * this.settings.messageDuration) + this.settings.initialDelay + 60; // +60 pour le CTA
+                    return Math.round(totalFrames / 30) + 's'; // 30 fps
+                },
+
+                addMessage() {
+                    this.conversation.messages.push({
+                        sender: 'user',
+                        text: ''
+                    });
+                },
+
+                removeMessage(index) {
+                    this.conversation.messages.splice(index, 1);
+                },
+
+                loadPreset(type) {
+                    if (type === 'jalousie') {
+                        this.conversation = {
+                            botName: 'Alex',
+                            gender: 'male',
+                            hook: 'POV : Il me cache quelque chose...',
+                            CTA: 'Red flag ou pas ?\nDites-moi tout !',
+                            messages: [
+                                { sender: 'user', text: 'Tu fais quoi ?' },
+                                { sender: 'bot', text: 'Rien de spécial pourquoi ?' },
+                                { sender: 'user', text: 'T\'es où ?' },
+                                { sender: 'bot', text: 'Chez moi\nPourquoi toutes ces questions ?' },
+                                { sender: 'user', text: 'Je t\'ai vu avec une fille aujourd\'hui' },
+                                { sender: 'bot', text: '...' },
+                                { sender: 'user', text: 'ALORS ?' }
+                            ]
+                        };
+                    } else if (type === 'mensonge') {
+                        this.conversation = {
+                            botName: 'Sarah',
+                            gender: 'female',
+                            hook: 'POV : Elle me ment en face...',
+                            CTA: 'Vous auriez fait quoi ?\nTeam vérité ou team silence ?',
+                            messages: [
+                                { sender: 'bot', text: 'Salut ! Tu fais quoi ce soir ?' },
+                                { sender: 'user', text: 'Rien de prévu, et toi ?' },
+                                { sender: 'bot', text: 'Pareil, je reste chez moi' },
+                                { sender: 'user', text: 'Ah... c\'est marrant' },
+                                { sender: 'bot', text: 'Pourquoi ?' },
+                                { sender: 'user', text: 'Parce que je te vois en story chez Tom...' },
+                                { sender: 'bot', text: 'Ah... je peux t\'expliquer' }
+                            ]
+                        };
+                    }
+                    this.showToast = true;
+                    this.toastMessage = `Preset "${type}" chargé !`;
+                    setTimeout(() => this.showToast = false, 3000);
+                },
+
+                exportJSON() {
+                    const data = {
+                        ...this.conversation,
+                        settings: this.settings
+                    };
+                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `conversation-${this.conversation.botName || 'untitled'}.json`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+
+                    this.showToast = true;
+                    this.toastMessage = 'Fichier JSON exporté !';
+                    setTimeout(() => this.showToast = false, 3000);
+                },
+
+                importJSON() {
+                    this.$refs.fileInput.click();
+                },
+
+                handleFileImport(event) {
+                    const file = event.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            try {
+                                const data = JSON.parse(e.target.result);
+                                if (data.botName && data.messages) {
+                                    this.conversation = {
+                                        botName: data.botName || 'Bot',
+                                        gender: data.gender || 'male',
+                                        hook: data.hook || '',
+                                        CTA: data.CTA || '',
+                                        messages: data.messages || []
+                                    };
+                                    if (data.settings) {
+                                        this.settings = { ...this.settings, ...data.settings };
+                                    }
+                                    this.showToast = true;
+                                    this.toastMessage = 'Conversation importée !';
+                                    setTimeout(() => this.showToast = false, 3000);
+                                } else {
+                                    alert('Format de fichier invalide. Assurez-vous que le fichier contient une conversation valide.');
+                                }
+                            } catch (error) {
+                                alert('Erreur lors de la lecture du fichier JSON.');
+                            }
+                        };
+                        reader.readAsText(file);
+                    }
+                },
+
+                async generateVideo() {
+                    if (this.conversation.messages.length === 0) {
+                        alert('Ajoutez au moins un message avant de générer la vidéo.');
+                        return;
+                    }
+
+                    this.loading = true;
+
+                    try {
+                        // Sauvegarder la conversation
+                        const filename = `web-generated-${Date.now()}.json`;
+                        await this.saveConversationFile(filename);
+
+                        // Informer l'utilisateur des prochaines étapes
+                        this.showToast = true;
+                        this.toastMessage = 'Conversation sauvegardée ! Consultez la console pour les commandes à exécuter.';
+
+                        // Afficher les instructions dans la console
+                        console.log('🎬 GÉNÉRATION DE VIDÉO');
+                        console.log('=====================');
+                        console.log('1. Votre conversation a été sauvegardée dans:', filename);
+                        console.log('2. Modifiez src/Sms.tsx pour importer votre conversation:');
+                        console.log(`   import conversation from "../public/conversations/${filename}";`);
+                        console.log('3. Lancez la prévisualisation:');
+                        console.log('   npm run dev');
+                        console.log('4. Générez la vidéo finale:');
+                        console.log('   npx remotion render Sms out/ma-video.mp4');
+                        console.log('=====================');
+
+                        setTimeout(() => this.showToast = false, 5000);
+
+                    } catch (error) {
+                        console.error('Erreur:', error);
+                        alert('Erreur lors de la sauvegarde. Consultez la console pour plus de détails.');
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+
+                async saveConversationFile(filename) {
+                    // Dans un environnement de développement local, nous pouvons utiliser l'API File System
+                    // Pour une solution complète, il faudrait un backend
+                    const data = JSON.stringify(this.conversation, null, 2);
+
+                    // Créer un lien de téléchargement automatique
+                    const blob = new Blob([data], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = filename;
+                    a.click();
+                    URL.revokeObjectURL(url);
+
+                    console.log('📁 Fichier téléchargé:', filename);
+                    console.log('📋 Placez ce fichier dans: public/conversations/');
+                }
+            };
+        }
+    </script>
+</body>
+
+</html>

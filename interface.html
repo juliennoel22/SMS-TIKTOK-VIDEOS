@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur de Vidéos iMessages</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .form-section {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 24px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .loading {
+            display: none;
+        }
+
+        .loading.show {
+            display: inline-block;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: #10b981;
+        }
+
+        .notification.error {
+            background: #ef4444;
+        }
+
+        .notification.info {
+            background: #3b82f6;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+    </style>
+</head>
+
+<body class="gradient-bg min-h-screen">
+    <!-- Notifications -->
+    <div id="notification" class="notification"></div>
+
+    <!-- Header -->
+    <header class="text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="text-center">
+                <h1 class="text-4xl font-bold mb-2">
+                    <i class="fas fa-mobile-alt mr-3"></i>
+                    Générateur de Vidéos iMessages
+                </h1>
+                <p class="text-xl opacity-90">Créez des vidéos TikTok engageantes en quelques clics</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 pb-8">
+
+        <!-- Quick Start Section -->
+        <div class="mb-8">
+            <div class="form-section fade-in">
+                <h2 class="text-3xl font-bold mb-6 text-gray-800 text-center">
+                    <i class="fas fa-play-circle mr-2 text-green-600"></i>
+                    Démarrage rapide
+                </h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                    <!-- Import JSON -->
+                    <div class="text-center p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 transition-colors cursor-pointer"
+                        onclick="openImportModal()">
+                        <div class="mb-4">
+                            <i class="fas fa-file-import text-4xl text-blue-600"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold mb-2">Importer un script JSON</h3>
+                        <p class="text-gray-600 text-sm">Collez votre conversation au format JSON pour la modifier
+                            rapidement</p>
+                    </div>
+
+                    <!-- Generate with AI -->
+                    <div class="text-center p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-purple-500 transition-colors cursor-pointer"
+                        onclick="openAIModal()">
+                        <div class="mb-4">
+                            <i class="fas fa-magic text-4xl text-purple-600"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold mb-2">Générer avec l'IA</h3>
+                        <p class="text-gray-600 text-sm">Créez une conversation automatiquement basée sur un thème ou
+                            une idée</p>
+                    </div>
+
+                    <!-- Create from scratch -->
+                    <div class="text-center p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-green-500 transition-colors cursor-pointer"
+                        onclick="createFromScratch()">
+                        <div class="mb-4">
+                            <i class="fas fa-plus-circle text-4xl text-green-600"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold mb-2">Créer de zéro</h3>
+                        <p class="text-gray-600 text-sm">Configurez manuellement tous les paramètres et messages</p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="max-w-4xl mx-auto">
+
+            <!-- Configuration Panel -->
+
+            <!-- Conversation Settings -->
+            <div class="form-section fade-in">
+                <h2 class="text-2xl font-bold mb-6 text-gray-800">
+                    <i class="fas fa-cogs mr-2 text-blue-600"></i>
+                    Configuration de la conversation
+                </h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-user mr-1"></i>
+                            Nom du contact
+                        </label>
+                        <input type="text" id="botName"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            placeholder="Tom, Sarah, etc." value="Tom">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-venus-mars mr-1"></i>
+                            Genre du contact
+                        </label>
+                        <select id="botGender"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="male">Masculin</option>
+                            <option value="female">Féminin</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-bullhorn mr-1"></i>
+                        Hook d'accroche (début de vidéo)
+                    </label>
+                    <textarea id="hook" rows="3"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="POV : Il m'a dit que c'était juste une collègue...">POV : Il m'a dit que c'était juste une collègue...</textarea>
+                </div>
+
+                <div class="mt-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-hand-pointer mr-1"></i>
+                        Call-to-Action (fin de vidéo)
+                    </label>
+                    <textarea id="cta" rows="3"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="Je fais quoi ? Aidez moi !">Je fais quoi ?\nAidez moi !</textarea>
+                </div>
+            </div>
+
+            <!-- Messages -->
+            <div class="form-section fade-in">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">
+                        <i class="fas fa-comments mr-2 text-green-600"></i>
+                        Messages de la conversation
+                    </h2>
+                    <button onclick="addMessage()" class="btn-primary">
+                        <i class="fas fa-plus mr-2"></i>
+                        Ajouter un message
+                    </button>
+                </div>
+
+                <div id="messagesContainer" class="space-y-4">
+                    <!-- Messages seront générés ici -->
+                </div>
+            </div>
+
+            <!-- Video Settings -->
+            <div class="form-section fade-in">
+                <h2 class="text-2xl font-bold mb-6 text-gray-800">
+                    <i class="fas fa-video mr-2 text-purple-600"></i>
+                    Paramètres vidéo
+                </h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-palette mr-1"></i>
+                            Thème
+                        </label>
+                        <select id="darkTheme"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="false">Clair</option>
+                            <option value="true">Sombre</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-clock mr-1"></i>
+                            Durée par message (frames)
+                        </label>
+                        <input type="number" id="messageDuration"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            value="60" min="30" max="120">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-hourglass-start mr-1"></i>
+                            Délai initial (frames)
+                        </label>
+                        <input type="number" id="initialDelay"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            value="120" min="60" max="300">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                    <div class="flex items-center">
+                        <input type="checkbox" id="showTypingBar" checked
+                            class="mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                        <label class="text-sm font-medium text-gray-700">
+                            <i class="fas fa-keyboard mr-1"></i>
+                            Afficher la barre de saisie
+                        </label>
+                    </div>
+
+                    <div class="flex items-center">
+                        <input type="checkbox" id="enableAudio"
+                            class="mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                        <label class="text-sm font-medium text-gray-700">
+                            <i class="fas fa-volume-up mr-1"></i>
+                            Activer la génération audio
+                        </label>
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <div class="flex items-center">
+                        <input type="checkbox" id="autoSave" checked
+                            class="mr-3 h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                        <label class="text-sm font-medium text-gray-700">
+                            <i class="fas fa-save mr-1"></i>
+                            Sauvegarde automatique après import/génération IA
+                        </label>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1 ml-7">
+                        Met à jour automatiquement la configuration Remotion après l'import JSON ou la génération IA
+                    </p>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="form-section fade-in">
+                <h2 class="text-2xl font-bold mb-6 text-gray-800">
+                    <i class="fas fa-rocket mr-2 text-red-600"></i>
+                    Actions
+                </h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <button onclick="saveAndConfigure()" class="btn-primary w-full">
+                        <i class="fas fa-save mr-2"></i>
+                        <span>Sauvegarder & Configurer</span>
+                        <div class="loading ml-2">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </div>
+                    </button>
+
+                    <button onclick="openRemotionStudio()" class="btn-primary w-full"
+                        style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                        <i class="fas fa-external-link-alt mr-2"></i>
+                        <span>Ouvrir Remotion Studio</span>
+                        <div class="loading ml-2">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </div>
+                    </button>
+                </div>
+
+                <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div class="flex items-center mb-2">
+                        <i class="fas fa-info-circle text-blue-600 mr-2"></i>
+                        <span class="font-semibold text-blue-800">Workflow de création</span>
+                    </div>
+                    <ol class="text-sm text-blue-700 list-decimal list-inside space-y-1">
+                        <li>Configurez votre conversation et paramètres ici</li>
+                        <li>Cliquez sur "Sauvegarder & Configurer" pour appliquer les changements</li>
+                        <li>Ouvrez Remotion Studio pour prévisualiser et rendre la vidéo</li>
+                        <li>Générez l'audio si nécessaire avec <code>npm run gen-audio</code> dans le terminal</li>
+                    </ol>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+    </div>
+
+    <!-- Import JSON Modal -->
+    <div id="importModal" class="fixed inset-0 bg-black bg-opacity-50 z-50" style="display: none;">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg p-8 max-w-4xl w-full max-h-90vh overflow-y-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-2xl font-bold text-gray-800">
+                        <i class="fas fa-file-import mr-2 text-blue-600"></i>
+                        Importer un script JSON
+                    </h3>
+                    <button onclick="closeImportModal()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-2xl"></i>
+                    </button>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Collez votre script JSON ici :
+                        </label>
+                        <textarea id="jsonInput" rows="15"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
+                            placeholder='Exemple :
+{
+  "botName": "Tom",
+  "gender": "male",
+  "hook": "POV : Il m\' a dit que c\'était juste une collègue...", "CTA" : "Je fais quoi ?\\nAidez moi !" , "messages"
+                            : [ { "sender" : "user" , "text" : "C\'est qui Jennifer ?" }, { "sender" : "bot" , "text"
+                            : "Tu parles de Jenny ? Ma collègue ?" } ] }'></textarea>
+                    </div>
+
+                    <div class="flex justify-between">
+                        <button onclick="validateAndImportJSON()" class="btn-primary">
+                            <i class="fas fa-check mr-2"></i>
+                            Importer et configurer
+                        </button>
+                        <button onclick="closeImportModal()" class="btn-secondary">
+                            Annuler
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Generation Modal -->
+    <div id="aiModal" class="fixed inset-0 bg-black bg-opacity-50 z-50" style="display: none;">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg p-8 max-w-2xl w-full">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-2xl font-bold text-gray-800">
+                        <i class="fas fa-magic mr-2 text-purple-600"></i>
+                        Générateur IA
+                    </h3>
+                    <button onclick="closeAIModal()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-2xl"></i>
+                    </button>
+                </div>
+
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-lightbulb mr-1"></i>
+                            Décrivez votre idée ou thème
+                        </label>
+                        <textarea id="aiPrompt" rows="4"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            placeholder="Exemple : Une conversation où quelqu'un découvre que son copain lui ment sur ses sorties, avec beaucoup de tension et un final ouvert qui laisse le spectateur sur sa faim..."></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Tone/Style</label>
+                            <select id="aiTone"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                <option value="drama">Dramatique</option>
+                                <option value="jealousy">Jalousie</option>
+                                <option value="betrayal">Trahison</option>
+                                <option value="toxic">Toxique</option>
+                                <option value="suspense">Suspense</option>
+                                <option value="humor">Humoristique</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Longueur</label>
+                            <select id="aiLength"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                <option value="short">Court (4-6 messages)</option>
+                                <option value="medium">Moyen (6-10 messages)</option>
+                                <option value="long">Long (10-15 messages)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                        <div class="flex items-center mb-2">
+                            <i class="fas fa-info-circle text-yellow-600 mr-2"></i>
+                            <span class="font-semibold text-yellow-800">Tips pour un bon prompt</span>
+                        </div>
+                        <ul class="text-sm text-yellow-700 list-disc list-inside space-y-1">
+                            <li>Décrivez la situation et les émotions recherchées</li>
+                            <li>Mentionnez le type de révélation ou twist souhaité</li>
+                            <li>Précisez si vous voulez une fin ouverte ou fermée</li>
+                            <li>Indiquez les personnages (âge, relation, contexte)</li>
+                        </ul>
+                    </div>
+
+                    <div class="flex justify-between">
+                        <button onclick="generateWithAIFromModal()" class="btn-primary"
+                            style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);">
+                            <i class="fas fa-magic mr-2"></i>
+                            <span>Générer la conversation</span>
+                            <div class="loading ml-2">
+                                <i class="fas fa-spinner fa-spin"></i>
+                            </div>
+                        </button>
+                        <button onclick="closeAIModal()" class="btn-secondary">
+                            Annuler
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

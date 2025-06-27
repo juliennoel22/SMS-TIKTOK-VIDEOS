@@ -10,8 +10,10 @@
     "@remotion/tailwind-v4": "4.0.286",
     "@remotion/transitions": "^4.0.286",
     "@remotion/zod-types": "4.0.286",
+    "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "elevenlabs": "^1.57.0",
+    "express": "^4.21.2",
     "openai": "^4.98.0",
     "react": "19.0.0",
     "react-dom": "19.0.0",
@@ -34,7 +36,9 @@
     "build": "remotion bundle",
     "upgrade": "remotion upgrade",
     "lint": "eslint src && tsc",
-    "gen-audio": "node scripts/generate-voiceoff.js"
+    "gen-audio": "node scripts/generate-voiceoff.js",
+    "interface": "node server.js",
+    "start": "npm run interface"
   },
   "sideEffects": [
     "*.css"

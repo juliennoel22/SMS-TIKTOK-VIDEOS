@@ -2,7 +2,7 @@ import "./index.css";
 import { Composition } from "remotion";
 import { Sms, myCompSchema3, messageDuration, initialDelay } from "./Sms";
 import { Test } from "./Test";
-import conversation from "../public/conversations/conv1.json"; // Import conversation data
+import conversation from "../public/conversations/conversation-1751025199000.json"; // Import conversation data
 
 const typingDuration = 80; // Match the value in Sms.tsx
 const totalMessages = conversation.messages.length;
