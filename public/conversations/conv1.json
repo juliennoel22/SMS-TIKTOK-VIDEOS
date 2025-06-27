@@ -1,76 +1,60 @@
 {
   "botName": "Tom",
   "gender": "male",
-  "hook": "POV : Mon mec me ments depuis le début...",
-  "CTA": "Je fais quoi ?\n Aidez-moi !",
+  "hook": "POV : Il m’a dit que c’était “juste une collègue”…",
+  "CTA": "Je fais quoi ?\nAidez moi !",
   "messages": [
     {
       "sender": "user",
-      "text": "On doit parler."
+      "text": "C’est qui Jennifer ?"
     },
     {
       "sender": "bot",
-      "text": "Att, de quoi tu parles là ?"
+      "text": "Tu parles de Jenny ? Ma collègue ?"
     },
     {
       "sender": "user",
-      "text": "Je sais ce que t'as fait… avec elle."
+      "text": "Ah ouais, une “collègue”…"
     },
     {
       "sender": "bot",
-      "text": "Quoi ? T’es sérieux là ?!"
+      "text": "Bah ouais\nPourquoi ?"
     },
     {
       "sender": "user",
-      "text": "Franchement… fallait pas me mentir."
+      "text": "Donc c’est JUSTE une collègue ?"
     },
     {
       "sender": "bot",
-      "text": "Mais je… Attends, tu sais quoi exactement ?"
+      "text": "Att, t’es jalouse ?"
     },
     {
       "sender": "user",
-      "text": "Je sais tout. Et tu pensais que j'avais pas vu ?"
+      "text": "non\nnon"
     },
     {
       "sender": "bot",
-      "text": "Non… NON, attends. C’est pas ce que tu crois."
+      "text": "Tu peux me le dire si t’es jalouse hein"
     },
     {
       "sender": "user",
-      "text": "Franchement… fallait pas me mentir."
+      "text": "jsp\nnon"
     },
     {
       "sender": "bot",
-      "text": "...C’est pas toi que j’aimais."
+      "text": "T’es *sûre* sûre ?\nUn tout petit peu ?"
     },
     {
       "sender": "user",
-      "text": "...Quoi ?"
+      "text": "J’AI DÉJÀ DIT NON"
     },
     {
       "sender": "bot",
-      "text": "Je t’ai jamais dit que c’était toi."
+      "text": "Ok ok chill\nJ’aimerais te faire un bisou là"
     },
     {
       "sender": "user",
-      "text": "Tu… T’es sérieux là ?"
-    },
-    {
-      "sender": "bot",
-      "text": "Je voulais juste te protéger."
-    },
-    {
-      "sender": "user",
-      "text": "Protéger de quoi ?"
-    },
-    {
-      "sender": "bot",
-      "text": "De la vérité."
-    },
-    {
-      "sender": "user",
-      "text": "Mais...\ntu ne peux pas me laiseer comme ca..."
+      "text": "VA DEMANDER À JENNY\nTA “COLLÈGUE”\nQUI LIKE TOUS TES POSTS 😐"
     }
   ]
 }

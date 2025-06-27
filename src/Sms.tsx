@@ -31,7 +31,7 @@ const framesPerChar = 3; // How many frames each character takes to type (lower 
 const typingDelayFrames = 2; // Delay between key presses (in frames)
 const typingIndicatorDuration = 30; // Duration to show typing indicator before message appears
 
-const darkTheme = true; // Toggle dark theme
+const darkTheme = false; // Toggle dark theme
 const showTypingInputBar = false; // Toggle typing/message input bar visibility
 
 const enableAudioGeneration = false; // Toggle to enable/disable audio generation
@@ -312,7 +312,7 @@ export const Sms: React.FC<
           // backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent black background
         }}
       >
-        {conversation.hook.match(/.{1,25}(?:\s|$)|\S+/g)?.map((line, index) => (
+        {conversation.hook.match(/.{1,30}(?:\s|$)|\S+/g)?.map((line, index) => (
           <div
             key={index}
             style={{
