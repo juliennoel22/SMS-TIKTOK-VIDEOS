@@ -1,0 +1,60 @@
+{
+    "botName": "Tom",
+    "gender": "male",
+    "hook": "POV : Il m’a dit que c’était “juste une collègue”…",
+    "CTA": "Je fais quoi ?\nAidez moi !",
+    "messages": [
+        {
+            "sender": "user",
+            "text": "C’est qui Jennifer ?"
+        },
+        {
+            "sender": "bot",
+            "text": "Tu parles de Jenny ? Ma collègue ?"
+        },
+        {
+            "sender": "user",
+            "text": "Ah ouais, une “collègue”…"
+        },
+        {
+            "sender": "bot",
+            "text": "Bah ouais\nPourquoi ?"
+        },
+        {
+            "sender": "user",
+            "text": "Donc c’est JUSTE une collègue ?"
+        },
+        {
+            "sender": "bot",
+            "text": "Att, t’es jalouse ?"
+        },
+        {
+            "sender": "user",
+            "text": "non\nnon"
+        },
+        {
+            "sender": "bot",
+            "text": "Tu peux me le dire si t’es jalouse hein"
+        },
+        {
+            "sender": "user",
+            "text": "jsp\nnon"
+        },
+        {
+            "sender": "bot",
+            "text": "T’es *sûre* sûre ?\nUn tout petit peu ?"
+        },
+        {
+            "sender": "user",
+            "text": "J’AI DÉJÀ DIT NON"
+        },
+        {
+            "sender": "bot",
+            "text": "Ok ok chill\nJ’aimerais te faire un bisou là"
+        },
+        {
+            "sender": "user",
+            "text": "VA DEMANDER À JENNY\nTA “COLLÈGUE”\nQUI LIKE TOUS TES POSTS 😐"
+        }
+    ]
+}

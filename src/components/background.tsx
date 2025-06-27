@@ -5,7 +5,7 @@ import profilePicture_female from "../../public/images/fille_pdp.png";
 import profilePicture_male from "../../public/images/garcon.png";
 import camera from "../../public/images/camera.png";
 import arrowGrey from "../../public/images/arrow_grey.png";
-import conversation from "../../public/conversations/conv1.json"; // Import JSON file
+import conversation from "../../public/conversations/conversation-main.json"; // Import JSON file
 
 
 export const Background: React.FC<{ darkTheme: boolean }> = ({ darkTheme }) => {
@@ -64,7 +64,7 @@ export const Background: React.FC<{ darkTheme: boolean }> = ({ darkTheme }) => {
               />
             </div>
           </div>
-            <div className="px-16 flex justify-between items-end">
+          <div className="px-16 flex justify-between items-end">
             <img src={arrow} alt="Back Arrow" className="h-15 " />
             <img
               src={conversation.gender === "male" ? profilePicture_male : profilePicture_female}
@@ -72,7 +72,7 @@ export const Background: React.FC<{ darkTheme: boolean }> = ({ darkTheme }) => {
               className="ml-5 h-36 rounded-full"
             />
             <img src={camera} alt="Camera Icon" className="h-12" />
-            </div>
+          </div>
           <div id="name" className={`flex justify-center items-center ${darkTheme ? "text-gray-300" : "text-gray-700"
             } text-3xl font-light mt-4 mb-8`}>
             <p className="font-bold">{conversation.botName}</p>

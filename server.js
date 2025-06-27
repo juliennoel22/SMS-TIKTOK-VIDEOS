@@ -59,6 +59,10 @@ app.post('/api/save-and-configure', async (req, res) => {
     try {
         const { conversation, settings } = req.body;
 
+        console.log('=== SAVE AND CONFIGURE DEBUG ===');
+        console.log('Conversation reçue:', JSON.stringify(conversation, null, 2));
+        console.log('Settings reçus:', JSON.stringify(settings, null, 2));
+
         if (!conversation || !conversation.messages || conversation.messages.length === 0) {
             return res.status(400).json({ error: 'Conversation invalide' });
         }
@@ -66,18 +70,18 @@ app.post('/api/save-and-configure', async (req, res) => {
         const conversationsDir = path.join(__dirname, 'public', 'conversations');
         await fs.mkdir(conversationsDir, { recursive: true });
 
-        const timestamp = Date.now();
-        const filename = `conversation-${timestamp}.json`;
+        const filename = `conversation-main.json`;
         const filePath = path.join(conversationsDir, filename);
 
         // Save conversation file
         await fs.writeFile(filePath, JSON.stringify(conversation, null, 2));
+        console.log('Fichier conversation sauvegardé:', filePath);
 
         // Update src/Sms.tsx with new import and settings
         await updateSmsConfiguration(filename, settings);
 
-        // Update Root.tsx for dynamic duration calculation
-        await updateRootConfiguration(filename);
+        // Update Root.tsx for dynamic duration calculation and gender configuration
+        await updateRootConfiguration(filename, conversation);
 
         res.json({
             success: true,
@@ -162,15 +166,19 @@ app.post('/api/render-video', async (req, res) => {
 
         // Update video settings if provided
         if (Object.keys(settings).length > 0) {
-            await updateVideoSettings(settings);
+            await updateSmsConfiguration(conversationFile, settings);
+        } else {
+            // Just update the import if no settings provided
+            await updateSmsConfiguration(conversationFile, {});
         }
-
-        // Update import in Sms.tsx
-        await updateSmsImport(conversationFile);
 
         const finalOutputName = outputName || `video-${Date.now()}.mp4`;
 
-        // Run Remotion render
+        // Ensure output directory exists
+        const outputDir = path.join(__dirname, 'out');
+        await fs.mkdir(outputDir, { recursive: true });
+
+        // Standard render without trimming (trimming is now handled separately)
         const renderResult = await runCommand(`npx remotion render Sms out/${finalOutputName}`);
 
         res.json({
@@ -190,7 +198,7 @@ app.post('/api/preview', async (req, res) => {
         const { conversationFile } = req.body;
 
         if (conversationFile) {
-            await updateSmsImport(conversationFile);
+            await updateSmsConfiguration(conversationFile, {});
         }
 
         // Start Remotion studio in background
@@ -285,8 +293,7 @@ app.post('/api/generate-ai', async (req, res) => {
         const conversationsDir = path.join(__dirname, 'public', 'conversations');
         await fs.mkdir(conversationsDir, { recursive: true });
 
-        const timestamp = Date.now();
-        const filename = `generated-conversation-${timestamp}.json`;
+        const filename = `conversation-main.json`;
         const filePath = path.join(conversationsDir, filename);
 
         await fs.writeFile(filePath, JSON.stringify(conversation, null, 2));
@@ -380,7 +387,7 @@ async function updateSmsConfiguration(conversationFile, settings) {
     }
 }
 
-async function updateRootConfiguration(conversationFile) {
+async function updateRootConfiguration(conversationFile, conversationData = null) {
     try {
         const rootPath = path.join(__dirname, 'src', 'Root.tsx');
         let content = await fs.readFile(rootPath, 'utf8');
@@ -398,6 +405,38 @@ async function updateRootConfiguration(conversationFile) {
             if (insertIndex !== -1) {
                 const lineEnd = content.indexOf('\n', insertIndex) + 1;
                 content = content.slice(0, lineEnd) + newImport + '\n' + content.slice(lineEnd);
+            }
+        }
+
+        // Update botGender and userGender if conversation data is provided
+        if (conversationData) {
+            console.log('Mise à jour du genre avec:', conversationData.gender);
+
+            // Update botGender based on conversation.gender
+            const botGenderRegex = /botGender: conversation\.gender === ["']female["'] \? ["']female["'] : ["']male["']/;
+            const newBotGender = `botGender: conversation.gender === "female" ? "female" : "male"`;
+
+            if (botGenderRegex.test(content)) {
+                content = content.replace(botGenderRegex, newBotGender);
+                console.log('Regex de botGender trouvé et remplacé');
+            } else {
+                console.log('Regex de botGender non trouvé dans Root.tsx');
+            }
+
+            // Note: userGender stays as "male" by default, but could be made configurable later
+        }
+
+        // Add/update a comment with timestamp to force hot reload
+        const timestampRegex = /\/\/ Updated: \d+/;
+        const newTimestamp = `// Updated: ${Date.now()}`;
+
+        if (timestampRegex.test(content)) {
+            content = content.replace(timestampRegex, newTimestamp);
+        } else {
+            // Add timestamp comment after the imports
+            const afterImports = content.indexOf('const typingDuration');
+            if (afterImports !== -1) {
+                content = content.slice(0, afterImports) + newTimestamp + '\n' + content.slice(afterImports);
             }
         }
 
@@ -547,4 +586,57 @@ app.listen(PORT, () => {
 process.on('SIGTERM', () => {
     console.log('👋 Arrêt du serveur...');
     process.exit(0);
+});
+
+// Trim video - remove initial delay from rendered video
+app.post('/api/trim-video', async (req, res) => {
+    try {
+        const {
+            inputVideoName,
+            outputVideoName,
+            initialDelayFrames = 120
+        } = req.body;
+
+        if (!inputVideoName || !outputVideoName) {
+            return res.status(400).json({ error: 'Noms des fichiers vidéo requis' });
+        }
+
+        const outputDir = path.join(__dirname, 'out');
+        const inputPath = path.join(outputDir, inputVideoName);
+        const outputPath = path.join(outputDir, outputVideoName);
+
+        // Check if input video exists
+        try {
+            await fs.access(inputPath);
+        } catch (error) {
+            return res.status(404).json({ error: `Fichier vidéo d'entrée non trouvé: ${inputVideoName}` });
+        }
+
+        // Calculate trim time: frames to seconds (30fps)
+        const trimSeconds = initialDelayFrames / 30;
+
+        console.log(`Découpage de la vidéo: suppression de ${trimSeconds}s (${initialDelayFrames} frames) du début`);
+
+        // Use FFmpeg to trim the video
+        const trimResult = await runCommand(`ffmpeg -i "${inputPath}" -ss ${trimSeconds} -c copy "${outputPath}" -y`);
+
+        // Remove temporary input file
+        try {
+            await fs.unlink(inputPath);
+            console.log(`Fichier temporaire supprimé: ${inputVideoName}`);
+        } catch (error) {
+            console.warn(`Impossible de supprimer le fichier temporaire: ${error.message}`);
+        }
+
+        res.json({
+            success: true,
+            message: 'Vidéo découpée avec succès',
+            filename: outputVideoName,
+            trimmedSeconds: trimSeconds,
+            output: trimResult
+        });
+    } catch (error) {
+        console.error('Erreur lors du découpage vidéo:', error);
+        res.status(500).json({ error: error.message });
+    }
 });

@@ -1,0 +1,80 @@
+{
+  "botName": "Guillaume",
+  "gender": "male",
+  "hook": "POV : Tu débarques en \nTurquie et tout déraille.",
+  "CTA": "Je fais quoi ?\nAidez moi !",
+  "messages": [
+    {
+      "sender": "user",
+      "text": "Guillaume, t'as deux minutes ?"
+    },
+    {
+      "sender": "bot",
+      "text": "Ouais, t'es où ?"
+    },
+    {
+      "sender": "user",
+      "text": "En Turquie, mais y'a un souci."
+    },
+    {
+      "sender": "bot",
+      "text": "Quoi ? T'es sérieux ?"
+    },
+    {
+      "sender": "user",
+      "text": "J'ai perdu mon passeport."
+    },
+    {
+      "sender": "bot",
+      "text": "Attends, comment ça ?"
+    },
+    {
+      "sender": "user",
+      "text": "Il était dans ma poche... maintenant disparu."
+    },
+    {
+      "sender": "bot",
+      "text": "T'as vérifié partout ?"
+    },
+    {
+      "sender": "user",
+      "text": "Ouais, rien. Même pas une trace."
+    },
+    {
+      "sender": "bot",
+      "text": "C'est chaud, tu fais quoi là ?"
+    },
+    {
+      "sender": "user",
+      "text": "Je sais pas... je flippe grave."
+    },
+    {
+      "sender": "bot",
+      "text": "Contacte l'ambassade direct !"
+    },
+    {
+      "sender": "user",
+      "text": "Et si quelqu'un l'utilise ?"
+    },
+    {
+      "sender": "bot",
+      "text": "T'inquiète, appelle vite. C'est urgent."
+    },
+    {
+      "sender": "user",
+      "text": "Je fais quoi si ça tourne mal ?"
+    },
+    {
+      "sender": "bot",
+      "text": "Reste calme, je suis là. On gère."
+    },
+    {
+      "sender": "user",
+      "text": "J'espère... tout peut basculer."
+    },
+    {
+      "sender": "bot",
+      "text": "On s'en sortira, promis."
+    }
+  ]
+}

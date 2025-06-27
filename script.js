@@ -6,54 +6,10 @@ let messages = [
 
 let messageCounter = 0;
 
-// Templates de conversations
-const conversationTemplates = [
-    {
-        name: "Jalousie - Collègue",
-        botName: "Tom",
-        gender: "male",
-        hook: "POV : Il m'a dit que c'était juste une collègue...",
-        CTA: "Je fais quoi ?\nAidez moi !",
-        messages: [
-            { sender: "user", text: "C'est qui Jennifer ?" },
-            { sender: "bot", text: "Tu parles de Jenny ? Ma collègue ?" },
-            { sender: "user", text: "Ah ouais, une collègue…" },
-            { sender: "bot", text: "Bah ouais\nPourquoi ?" },
-            { sender: "user", text: "Donc c'est JUSTE une collègue ?" },
-            { sender: "bot", text: "Att, t'es jalouse ?" }
-        ]
-    },
-    {
-        name: "Mensonge - Sortie",
-        botName: "Alex",
-        gender: "male",
-        hook: "POV : Il ment sur où il était hier soir...",
-        CTA: "Vous auriez fait quoi ?",
-        messages: [
-            { sender: "user", text: "Tu étais où hier ?" },
-            { sender: "bot", text: "Chez moi pourquoi ?" },
-            { sender: "user", text: "T'es sûr ?" },
-            { sender: "bot", text: "Oui bah évidemment" },
-            { sender: "user", text: "Alors pourquoi Sarah t'a vu en ville ?" },
-            { sender: "bot", text: "..." }
-        ]
-    },
-    {
-        name: "Trahison - Meilleure amie",
-        botName: "Emma",
-        gender: "female",
-        hook: "POV : Ma meilleure amie sort avec mon ex...",
-        CTA: "Team Emma ou team moi ?",
-        messages: [
-            { sender: "user", text: "J'ai vu tes stories avec Lucas" },
-            { sender: "bot", text: "Et alors ?" },
-            { sender: "user", text: "C'est mon ex Emma..." },
-            { sender: "bot", text: "Plus maintenant non ?" },
-            { sender: "user", text: "T'es sérieuse là ?" },
-            { sender: "bot", text: "Il est libre maintenant 🤷‍♀️" }
-        ]
-    }
-];
+// Function to remove accents from text (used only for filename)
+function removeAccents(text) {
+    return text.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
 
 // Notification system
 function showNotification(message, type = 'info') {
@@ -83,12 +39,6 @@ async function checkAIAvailability() {
                 };
             });
 
-            const aiButton = document.querySelector('button[onclick*="generateWithAI"]');
-            if (aiButton) {
-                aiButton.disabled = true;
-                aiButton.innerHTML = '<i class="fas fa-exclamation-triangle mr-2"></i>IA non disponible';
-            }
-
             console.warn('⚠️ IA non disponible - clé API manquante');
         } else {
             console.log('✅ IA disponible');
@@ -100,8 +50,89 @@ async function checkAIAvailability() {
 
 // Initialize page
 document.addEventListener('DOMContentLoaded', function () {
-    loadMessages();
+    console.log('DOM loaded, initializing...');
+
+    // Load existing conversation first
+    loadExistingConversation();
+
     checkAIAvailability();
+
+    // Wait a bit to ensure DOM is fully loaded
+    setTimeout(() => {
+        // Add event listeners for contact name and gender updates
+        const botNameInput = document.getElementById('botName');
+        const botGenderSelect = document.getElementById('botGender');
+
+        console.log('Found elements:', {
+            botNameInput: !!botNameInput,
+            botGenderSelect: !!botGenderSelect,
+            botNameValue: botNameInput?.value,
+            botGenderValue: botGenderSelect?.value
+        });
+
+        if (botNameInput) {
+            console.log('Adding input listener to botName');
+
+            // Multiple event types to catch all changes
+            ['input', 'change', 'keyup', 'paste'].forEach(eventType => {
+                botNameInput.addEventListener(eventType, function () {
+                    console.log(`botName ${eventType} event - value:`, this.value);
+                    setTimeout(updateContactNameDisplay, 10);
+                });
+            });
+        } else {
+            console.error('botName element not found!');
+        }
+
+        if (botGenderSelect) {
+            console.log('Adding change listener to botGender');
+
+            ['change', 'input'].forEach(eventType => {
+                botGenderSelect.addEventListener(eventType, function () {
+                    console.log(`botGender ${eventType} event - value:`, this.value);
+                    setTimeout(updateContactNameDisplay, 10);
+                });
+            });
+        } else {
+            console.error('botGender element not found!');
+        }
+    }, 100);
+
+    // Add essential shortcuts
+    document.addEventListener('keydown', function (e) {
+        // Ctrl+S to save and configure
+        if (e.ctrlKey && e.key === 's') {
+            e.preventDefault();
+            saveAndConfigure();
+        }
+
+        // Escape to close modals
+        if (e.key === 'Escape') {
+            closeImportModal();
+            closeAIModal();
+            hideAISpinner();
+        }
+    });
+
+    // Close modals when clicking outside
+    document.getElementById('importModal').addEventListener('click', function (e) {
+        if (e.target === this) {
+            closeImportModal();
+        }
+    });
+
+    document.getElementById('aiModal').addEventListener('click', function (e) {
+        if (e.target === this) {
+            closeAIModal();
+        }
+    });
+
+    // Close spinner when clicking outside
+    document.getElementById('aiSpinner').addEventListener('click', function (e) {
+        if (e.target === this) {
+            hideAISpinner();
+        }
+    });
 });
 
 // Message management
@@ -115,13 +146,13 @@ function addMessage() {
     messageDiv.innerHTML = `
         <div class="flex-shrink-0">
             <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                <i class="fas fa-comment text-blue-600"></i>
+                <i class="fas fa-user"></i>
             </div>
         </div>
         <div class="flex-grow">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
                 <div>
-                    <select class="sender-select w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <select class="sender-select w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" onchange="updateMessageColors(${messageCounter})">
                         <option value="user">Utilisateur</option>
                         <option value="bot">Contact</option>
                     </select>
@@ -147,6 +178,7 @@ function addMessage() {
     `;
 
     container.appendChild(messageDiv);
+    updateMessageColors(messageCounter);
 
     // Add event listeners
     const textarea = messageDiv.querySelector('.message-text');
@@ -156,7 +188,7 @@ function addMessage() {
         // No preview update needed
     });
     select.addEventListener('change', function () {
-        // No preview update needed
+        updateMessageColors(messageCounter);
     });
 }
 
@@ -201,13 +233,13 @@ function loadMessages() {
         messageDiv.innerHTML = `
             <div class="flex-shrink-0">
                 <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                    <i class="fas fa-comment text-blue-600"></i>
+                    <i class="fas fa-user"></i>
                 </div>
             </div>
             <div class="flex-grow">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
                     <div>
-                        <select class="sender-select w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <select class="sender-select w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" onchange="updateMessageColors(${messageCounter})">
                             <option value="user" ${msg.sender === 'user' ? 'selected' : ''}>Utilisateur</option>
                             <option value="bot" ${msg.sender === 'bot' ? 'selected' : ''}>Contact</option>
                         </select>
@@ -233,6 +265,7 @@ function loadMessages() {
         `;
 
         container.appendChild(messageDiv);
+        updateMessageColors(messageCounter);
 
         // Add event listeners
         const textarea = messageDiv.querySelector('.message-text');
@@ -242,10 +275,124 @@ function loadMessages() {
             // No preview update needed
         });
         select.addEventListener('change', function () {
-            // No preview update needed
+            updateMessageColors(messageCounter);
         });
     });
 }
+
+// Load existing conversation data from the main JSON file
+async function loadExistingConversation() {
+    try {
+        const response = await fetch('/public/conversations/conversation-main.json');
+        if (response.ok) {
+            const data = await response.json();
+
+            console.log('Chargement de la conversation existante:', data);
+
+            // Load form fields
+            document.getElementById('botName').value = data.botName || 'Tom';
+            document.getElementById('botGender').value = data.gender || 'male';
+            document.getElementById('hook').value = data.hook || '';
+            document.getElementById('cta').value = data.CTA || '';
+
+            // Load messages
+            messages = data.messages || [
+                { sender: "user", text: "C'est qui Jennifer ?" },
+                { sender: "bot", text: "Tu parles de Jenny ? Ma collègue ?" }
+            ];
+
+            // Update display
+            loadMessages();
+            updateContactNameDisplay();
+
+            console.log('Conversation existante chargée avec succès');
+        } else {
+            console.log('Aucune conversation existante trouvée, utilisation des valeurs par défaut');
+        }
+    } catch (error) {
+        console.log('Erreur lors du chargement de la conversation:', error);
+        console.log('Utilisation des valeurs par défaut');
+    }
+}
+
+// Function to update message colors based on sender
+function updateMessageColors(messageId) {
+    const messageDiv = document.getElementById(`message-${messageId}`);
+    if (!messageDiv) return;
+
+    const senderSelect = messageDiv.querySelector('.sender-select');
+    const sender = senderSelect.value;
+
+    // Remove existing classes
+    messageDiv.classList.remove('message-user', 'message-bot');
+
+    // Add appropriate class based on sender
+    if (sender === 'user') {
+        messageDiv.classList.add('message-user');
+        senderSelect.classList.add('message-sender-label');
+    } else {
+        messageDiv.classList.add('message-bot');
+        senderSelect.classList.add('message-sender-label');
+    }
+}
+
+// Update all message colors
+function updateAllMessageColors() {
+    const messageElements = document.querySelectorAll('#messagesContainer > div');
+    messageElements.forEach(element => {
+        const id = element.id.replace('message-', '');
+        updateMessageColors(parseInt(id));
+    });
+}
+
+// Update contact name display in interface
+function updateContactNameDisplay() {
+    const botName = document.getElementById('botName').value || 'Contact';
+    const botGender = document.getElementById('botGender').value;
+
+    console.log('Updating contact name display:', botName, botGender);
+
+    // Update all bot option labels
+    const botOptions = document.querySelectorAll('option[value="bot"]');
+    console.log('Found', botOptions.length, 'bot options to update');
+
+    botOptions.forEach(option => {
+        option.textContent = botName;
+    });
+
+    // Force refresh of all select elements to show the new name
+    const allSelects = document.querySelectorAll('.sender-select');
+    allSelects.forEach(select => {
+        // Store current value
+        const currentValue = select.value;
+
+        // Update the display text directly
+        if (currentValue === 'bot') {
+            const selectedOption = select.querySelector('option[value="bot"]');
+            if (selectedOption) {
+                selectedOption.textContent = botName;
+                // Force a visual refresh by temporarily changing selection
+                select.selectedIndex = -1;
+                select.value = currentValue;
+
+                // Trigger change event to ensure any listeners are notified
+                const changeEvent = new Event('change', { bubbles: true });
+                select.dispatchEvent(changeEvent);
+            }
+        }
+    });
+
+    // Force update of all existing message displays
+    updateAllMessageColors();
+
+    // Extra validation - log final state
+    setTimeout(() => {
+        const finalBotOptions = document.querySelectorAll('option[value="bot"]');
+        console.log('Final bot option texts:', Array.from(finalBotOptions).map(opt => opt.textContent));
+    }, 50);
+}
+
+
 
 // Preview management
 // Conversation management
@@ -254,6 +401,13 @@ function getConversationData() {
     const botGender = document.getElementById('botGender').value;
     const hook = document.getElementById('hook').value;
     const cta = document.getElementById('cta').value;
+
+    // Debug: log les éléments et leurs valeurs
+    console.log('getConversationData debug:');
+    console.log('- botName element:', document.getElementById('botName'));
+    console.log('- botName value:', botName);
+    console.log('- botGender element:', document.getElementById('botGender'));
+    console.log('- botGender value:', botGender);
 
     // Get messages from form
     const messages = [];
@@ -288,6 +442,8 @@ async function saveAndConfigure() {
     try {
         const conversationData = getConversationData();
 
+        console.log('botName:', conversationData.botName, 'gender:', conversationData.gender);
+
         if (conversationData.messages.length === 0) {
             throw new Error('Ajoutez au moins un message à la conversation');
         }
@@ -298,7 +454,7 @@ async function saveAndConfigure() {
             messageDuration: parseInt(document.getElementById('messageDuration').value),
             initialDelay: parseInt(document.getElementById('initialDelay').value),
             showTypingInputBar: document.getElementById('showTypingBar').checked,
-            enableAudioGeneration: document.getElementById('enableAudio').checked
+            enableAudioGeneration: document.getElementById('enableAudio')?.checked || false
         };
 
         // Save conversation and update code
@@ -316,7 +472,7 @@ async function saveAndConfigure() {
         const result = await response.json();
 
         if (result.success) {
-            showNotification('Configuration sauvegardée avec succès !', 'success');
+            showNotification('✅ Configuration sauvegardée avec succès !', 'success');
             showConfigurationInstructions(result.filename);
         } else {
             throw new Error(result.error || 'Erreur lors de la sauvegarde');
@@ -370,6 +526,296 @@ async function openRemotionStudio() {
     }
 }
 
+// Render video function
+async function renderVideo() {
+    const button = event.target.closest('button');
+    const loading = button?.querySelector('.loading');
+    const span = button?.querySelector('span');
+
+    if (loading) loading.classList.add('show');
+    if (button) button.disabled = true;
+    if (span) span.textContent = 'Rendu en cours...';
+
+    try {
+        // Get current settings
+        const conversationData = getConversationData();
+        if (conversationData.messages.length === 0) {
+            throw new Error('Aucun message à rendre');
+        }
+
+        // Create filename from hook and date (remove accents only for filename)
+        const hook = document.getElementById('hook')?.value || 'video';
+        const cleanHook = removeAccents(hook) // Remove accents only for filename
+            .replace(/[^\w\s-]/g, '') // Remove special characters except spaces and hyphens
+            .replace(/\s+/g, '-') // Replace spaces with hyphens
+            .substring(0, 50); // Limit length
+
+        // Format date as dd-mm-yyyy
+        const now = new Date();
+        const day = String(now.getDate()).padStart(2, '0');
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const year = now.getFullYear();
+        const dateStr = `${day}-${month}-${year}`;
+
+        const outputName = `${cleanHook}-${dateStr}.mp4`;
+
+        // Get video settings
+        const videoSettings = {
+            darkTheme: document.getElementById('darkTheme')?.value === 'true' || false,
+            messageDuration: parseInt(document.getElementById('messageDuration')?.value) || 60,
+            initialDelay: parseInt(document.getElementById('initialDelay')?.value) || 120,
+            showTypingInputBar: document.getElementById('showTypingBar')?.checked || false,
+            enableAudioGeneration: document.getElementById('enableAudio')?.checked || false
+        };
+
+        // Show progress modal
+        showRenderProgressModal();
+
+        showNotification('Démarrage du rendu vidéo...', 'info');
+
+        // Save the original conversation (keeping accents in content)
+        const response = await fetch('/api/save-and-configure', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                conversation: conversationData, // Keep original conversation with accents
+                settings: videoSettings
+            })
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Erreur HTTP sauvegarde:', response.status, errorText);
+            throw new Error(`Erreur lors de la sauvegarde: ${errorText}`);
+        }
+
+        const result = await response.json();
+        if (!result.success) {
+            throw new Error(result.error || 'Erreur lors de la sauvegarde de la conversation');
+        }
+
+        // Render the video
+        const renderResponse = await fetch('/api/render-video', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                conversationFile: 'conversation-main.json',
+                settings: videoSettings,
+                outputName: outputName
+            })
+        });
+
+        if (!renderResponse.ok) {
+            const errorText = await renderResponse.text();
+            console.error('Erreur HTTP rendu:', renderResponse.status, errorText);
+            throw new Error(`Erreur HTTP ${renderResponse.status}: ${errorText}`);
+        }
+
+        const renderResult = await renderResponse.json();
+
+        if (renderResult.success) {
+            // Complete progress bar
+            completeProgress();
+
+            showNotification(`✅ Vidéo rendue avec succès : ${renderResult.filename}`, 'success');
+            console.log('Fichier vidéo créé:', renderResult.filename);
+
+            // Wait a moment then show success modal
+            setTimeout(() => {
+                hideRenderProgressModal();
+                showRenderSuccessModal(renderResult.filename);
+            }, 1500);
+        } else {
+            throw new Error(renderResult.error || 'Erreur lors du rendu');
+        }
+
+    } catch (error) {
+        console.error('Erreur lors du rendu:', error);
+        showNotification(`❌ Erreur de rendu: ${error.message}`, 'error');
+
+        // Hide progress modal immediately on error
+        hideRenderProgressModal();
+    } finally {
+        if (loading) loading.classList.remove('show');
+        if (button) button.disabled = false;
+        if (span) span.textContent = 'Faire le rendu';
+    }
+}
+
+// Show render progress modal
+function showRenderProgressModal() {
+    const modal = document.createElement('div');
+    modal.id = 'renderProgressModal';
+    modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+    modal.innerHTML = `
+        <div class="bg-white rounded-lg p-8 max-w-md mx-4">
+            <div class="text-center">
+                <div class="mb-4">
+                    <i class="fas fa-video text-6xl text-red-600"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-4 text-gray-800">Rendu en cours...</h3>
+                <div class="text-gray-600 mb-6">
+                    <p class="mb-4">Génération de votre vidéo iMessage</p>
+                    
+                    <!-- Progress bar -->
+                    <div class="w-full bg-gray-200 rounded-full h-3 mb-4">
+                        <div id="progressBar" class="bg-gradient-to-r from-red-500 to-red-600 h-3 rounded-full transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                    
+                    <!-- Progress steps -->
+                    <div class="text-sm text-left space-y-2">
+                        <div id="step1" class="flex items-center">
+                            <i class="fas fa-spinner fa-spin text-blue-500 mr-2"></i>
+                            <span>Configuration des paramètres...</span>
+                        </div>
+                        <div id="step2" class="flex items-center text-gray-400">
+                            <i class="fas fa-clock mr-2"></i>
+                            <span>Rendu MP4 complet...</span>
+                        </div>
+                        <div id="step3" class="flex items-center text-gray-400">
+                            <i class="fas fa-clock mr-2"></i>
+                            <span>Découpage des 4 secondes initiales...</span>
+                        </div>
+                        <div id="step4" class="flex items-center text-gray-400">
+                            <i class="fas fa-clock mr-2"></i>
+                            <span>Finalisation...</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-xs text-gray-500">
+                    ⏱️ Temps estimé : 45-90 secondes
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    // Start progress animation
+    animateProgress();
+}
+
+// Hide render progress modal
+function hideRenderProgressModal() {
+    const modal = document.getElementById('renderProgressModal');
+    if (modal) {
+        document.body.removeChild(modal);
+    }
+}
+
+// Animate progress bar and steps
+function animateProgress() {
+    const progressBar = document.getElementById('progressBar');
+    const steps = ['step1', 'step2', 'step3', 'step4'];
+    let currentStep = 0;
+    let progress = 0;
+
+    const interval = setInterval(() => {
+        // Update progress bar
+        progress += Math.random() * 5 + 2; // Random increment between 2-7%
+        if (progress > 95) progress = 95; // Don't complete until render is done
+
+        if (progressBar) {
+            progressBar.style.width = progress + '%';
+        }
+
+        // Update steps
+        if (progress > 25 && currentStep === 0) {
+            updateStep('step1', 'step2', 'Rendu MP4 complet...');
+            currentStep = 1;
+        } else if (progress > 60 && currentStep === 1) {
+            updateStep('step2', 'step3', 'Découpage des 4 secondes initiales...');
+            currentStep = 2;
+        } else if (progress > 85 && currentStep === 2) {
+            updateStep('step3', 'step4', 'Finalisation...');
+            currentStep = 3;
+        }
+
+        // Stop if modal is removed
+        if (!document.getElementById('renderProgressModal')) {
+            clearInterval(interval);
+        }
+    }, 800);
+}
+
+// Update step status
+function updateStep(currentStepId, nextStepId, nextText) {
+    const currentStep = document.getElementById(currentStepId);
+    const nextStep = document.getElementById(nextStepId);
+
+    if (currentStep) {
+        currentStep.innerHTML = `
+            <i class="fas fa-check text-green-500 mr-2"></i>
+            <span class="text-green-600">${currentStep.querySelector('span').textContent}</span>
+        `;
+    }
+
+    if (nextStep) {
+        nextStep.innerHTML = `
+            <i class="fas fa-spinner fa-spin text-blue-500 mr-2"></i>
+            <span>${nextText}</span>
+        `;
+        nextStep.classList.remove('text-gray-400');
+    }
+}
+
+// Complete progress animation
+function completeProgress() {
+    const progressBar = document.getElementById('progressBar');
+    const step4 = document.getElementById('step4');
+
+    if (progressBar) {
+        progressBar.style.width = '100%';
+    }
+
+    if (step4) {
+        step4.innerHTML = `
+            <i class="fas fa-check text-green-500 mr-2"></i>
+            <span class="text-green-600">Finalisation terminée !</span>
+        `;
+        step4.classList.remove('text-gray-400');
+    }
+}
+
+// Show render success modal
+function showRenderSuccessModal(filename) {
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+    modal.innerHTML = `
+        <div class="bg-white rounded-lg p-8 max-w-lg mx-4">
+            <div class="text-center">
+                <div class="mb-4">
+                    <i class="fas fa-check-circle text-6xl text-green-600"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-4 text-gray-800">Rendu terminé !</h3>
+                <div class="text-gray-600 mb-6">
+                    <p class="mb-2">Votre vidéo a été générée avec succès :</p>
+                    <p class="font-mono text-sm bg-gray-100 p-2 rounded break-all">${filename}</p>
+                    <p class="mt-2 text-sm">📁 Emplacement : dossier /out/</p>
+                    <p class="mt-2 text-xs text-green-600">✂️ Délai initial de 4 secondes automatiquement supprimé</p>
+                </div>
+                <button onclick="this.closest('.fixed').remove()" class="btn-primary">
+                    <i class="fas fa-times mr-2"></i>
+                    Fermer
+                </button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    // Auto-remove after 10 seconds
+    setTimeout(() => {
+        if (document.body.contains(modal)) {
+            document.body.removeChild(modal);
+        }
+    }, 10000);
+}
+
+// Configuration instructions display
 function showConfigurationInstructions(filename) {
     const instructions = `
 ✅ Configuration appliquée avec succès !
@@ -384,6 +830,7 @@ function showConfigurationInstructions(filename) {
     console.log(instructions);
 }
 
+// Remotion instructions display
 function showRemotionInstructions() {
     const modal = document.createElement('div');
     modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
@@ -395,229 +842,35 @@ function showRemotionInstructions() {
                 </div>
                 <h3 class="text-2xl font-bold mb-4 text-gray-800">Remotion Studio</h3>
                 <div class="text-left space-y-3 mb-6">
-                    <p class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Configuration appliquée</p>
-                    <p class="flex items-center"><i class="fas fa-external-link-alt text-blue-500 mr-2"></i> Studio ouvert dans un nouvel onglet</p>
-                    <p class="flex items-center"><i class="fas fa-play text-purple-500 mr-2"></i> Prévisualisez votre vidéo</p>
-                    <p class="flex items-center"><i class="fas fa-download text-orange-500 mr-2"></i> Rendez en MP4 quand prêt</p>
+                    <p class="text-gray-600"><strong>🎬 Studio ouvert !</strong> Votre navigateur va s'ouvrir sur Remotion Studio.</p>
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <h4 class="font-semibold text-blue-800 mb-2">Dans Remotion Studio vous pouvez :</h4>
+                        <ul class="text-sm text-blue-700 list-disc list-inside space-y-1">
+                            <li>Prévisualiser votre vidéo en temps réel</li>
+                            <li>Ajuster les timings et paramètres</li>
+                            <li>Exporter la vidéo finale en MP4</li>
+                        </ul>
+                    </div>
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <h4 class="font-semibold text-green-800 mb-2">💡 Astuce :</h4>
+                        <p class="text-sm text-green-700">Utilisez le bouton "Faire le rendu" ici pour exporter directement sans passer par Remotion Studio.</p>
+                    </div>
                 </div>
-                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-                    <p class="text-sm text-yellow-800">
-                        <i class="fas fa-info-circle mr-2"></i>
-                        <strong>Pour l'audio :</strong> Utilisez <code>npm run gen-audio</code> dans le terminal avant le rendu final.
-                    </p>
-                </div>
-                <button onclick="this.parentElement.parentElement.remove()" class="btn-primary">
+                <button onclick="this.closest('.fixed').remove()" class="btn-primary">
                     <i class="fas fa-check mr-2"></i>
                     Compris !
                 </button>
             </div>
         </div>
     `;
-
     document.body.appendChild(modal);
 
-    // Auto-remove after 10 seconds
+    // Auto-remove after 15 seconds
     setTimeout(() => {
         if (document.body.contains(modal)) {
             document.body.removeChild(modal);
         }
-    }, 10000);
-}
-
-async function generateWithAI() {
-    const button = event.target;
-    const loading = button.querySelector('.loading');
-    const span = button.querySelector('span');
-
-    if (loading) loading.classList.add('show');
-    button.disabled = true;
-
-    try {
-        const topic = document.getElementById('aiTopic')?.value?.trim() || 'conversation générale';
-
-        // Call the real OpenAI API via our server
-        const response = await fetch('/api/generate-ai', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                prompt: `Créez une conversation sur le thème: ${topic}`,
-                tone: 'drama',
-                length: 'medium'
-            })
-        });
-
-        const result = await response.json();
-
-        if (!result.success) {
-            throw new Error(result.error || 'Erreur lors de la génération IA');
-        }
-
-        const generatedConversation = result.conversation;
-
-        // Fill form with generated data
-        document.getElementById('botName').value = generatedConversation.botName;
-        document.getElementById('botGender').value = generatedConversation.gender;
-        document.getElementById('hook').value = generatedConversation.hook;
-        document.getElementById('cta').value = generatedConversation.CTA;
-
-        // Clear existing messages and load new ones
-        messages = generatedConversation.messages;
-        loadMessages();
-
-        showNotification('Conversation générée par IA avec succès !', 'success');
-
-    } catch (error) {
-        showNotification(`Erreur: ${error.message}`, 'error');
-    } finally {
-        if (loading) loading.classList.remove('show');
-        button.disabled = false;
-    }
-}
-
-function generateRandomConversation(topic) {
-    const names = ['Alex', 'Sarah', 'Tom', 'Emma', 'Lucas', 'Chloé', 'Maxime', 'Léa'];
-    const randomName = names[Math.floor(Math.random() * names.length)];
-    const randomGender = Math.random() > 0.5 ? 'male' : 'female';
-
-    // Simple AI-like generation based on topic
-    const topicTemplates = {
-        'jalousie': {
-            hook: `POV : ${randomName} est jaloux/jalouse...`,
-            messages: [
-                { sender: "user", text: "Tu étais avec qui hier ?" },
-                { sender: "bot", text: "Avec des amis pourquoi ?" },
-                { sender: "user", text: "Des amis... lesquels ?" },
-                { sender: "bot", text: "Tu me fais une crise de jalousie là ?" }
-            ]
-        },
-        'mensonge': {
-            hook: `POV : ${randomName} me ment en face...`,
-            messages: [
-                { sender: "user", text: "Tu m'as dit que tu travaillais" },
-                { sender: "bot", text: "Oui et alors ?" },
-                { sender: "user", text: "Je t'ai vu au ciné avec quelqu'un" },
-                { sender: "bot", text: "..." }
-            ]
-        },
-        'trahison': {
-            hook: `POV : ${randomName} me trahit...`,
-            messages: [
-                { sender: "user", text: "J'ai appris pour toi et mon ex" },
-                { sender: "bot", text: "On peut en parler ?" },
-                { sender: "user", text: "NON on peut pas en parler" },
-                { sender: "bot", text: "C'est pas ce que tu crois..." }
-            ]
-        }
-    };
-
-    const template = topicTemplates[topic.toLowerCase()] || topicTemplates['jalousie'];
-
-    return {
-        botName: randomName,
-        gender: randomGender,
-        hook: template.hook,
-        CTA: "Vous en pensez quoi ?\nDites-moi en commentaire !",
-        messages: template.messages
-    };
-}
-
-// Template management
-function loadTemplate(templateIndex) {
-    const template = conversationTemplates[templateIndex];
-
-    if (template) {
-        document.getElementById('botName').value = template.botName;
-        document.getElementById('botGender').value = template.gender;
-        document.getElementById('hook').value = template.hook;
-        document.getElementById('cta').value = template.CTA;
-
-        messages = [...template.messages];
-        loadMessages();
-
-        showNotification(`Template "${template.name}" chargé !`, 'success');
-    }
-}
-
-// Event listeners for real-time updates
-document.addEventListener('DOMContentLoaded', function () {
-    // Add event listeners for real-time updates (removing preview functionality)
-    const inputs = ['botName', 'botGender', 'hook', 'cta'];
-    inputs.forEach(id => {
-        const element = document.getElementById(id);
-        if (element) {
-            // No longer need preview update listeners
-        }
-    });
-
-    // Add essential shortcuts only
-    document.addEventListener('keydown', function (e) {
-        // Ctrl+S to save and configure
-        if (e.ctrlKey && e.key === 's') {
-            e.preventDefault();
-            saveAndConfigure();
-        }
-
-        // Escape to close modals
-        if (e.key === 'Escape') {
-            closeImportModal();
-            closeAIModal();
-        }
-    });
-
-    // Close modals when clicking outside
-    document.getElementById('importModal').addEventListener('click', function (e) {
-        if (e.target === this) {
-            closeImportModal();
-        }
-    });
-
-    document.getElementById('aiModal').addEventListener('click', function (e) {
-        if (e.target === this) {
-            closeAIModal();
-        }
-    });
-});
-
-// Utility functions
-function downloadJSON(data, filename) {
-    const jsonStr = JSON.stringify(data, null, 2);
-    const blob = new Blob([jsonStr], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-}
-
-// Quick actions
-function quickAction(action) {
-    switch (action) {
-        case 'clear':
-            if (confirm('Effacer toute la conversation ?')) {
-                document.getElementById('messagesContainer').innerHTML = '';
-                messageCounter = 0;
-                showNotification('Conversation effacée', 'info');
-            }
-            break;
-
-        case 'duplicate':
-            const conversationData = getConversationData();
-            const timestamp = new Date().getTime();
-            downloadJSON(conversationData, `conversation-copy-${timestamp}.json`);
-            showNotification('Copie de la conversation téléchargée', 'success');
-            break;
-
-        case 'random':
-            const randomTemplate = conversationTemplates[Math.floor(Math.random() * conversationTemplates.length)];
-            loadTemplate(conversationTemplates.indexOf(randomTemplate));
-            break;
-    }
+    }, 15000);
 }
 
 // Modal management functions
@@ -649,6 +902,9 @@ function createFromScratch() {
         document.getElementById('botGender').value = 'male';
         document.getElementById('hook').value = '';
         document.getElementById('cta').value = '';
+
+        // Update contact name display
+        updateContactNameDisplay();
 
         // Clear messages
         messages = [];
@@ -702,6 +958,17 @@ function validateAndImportJSON() {
         document.getElementById('hook').value = data.hook || '';
         document.getElementById('cta').value = data.CTA || '';
 
+        // Trigger change events manually to ensure listeners are fired
+        const botNameEvent = new Event('change', { bubbles: true });
+        const botGenderEvent = new Event('change', { bubbles: true });
+        document.getElementById('botName').dispatchEvent(botNameEvent);
+        document.getElementById('botGender').dispatchEvent(botGenderEvent);
+
+        // Update contact name display
+        setTimeout(() => {
+            updateContactNameDisplay();
+        }, 100);
+
         // Load messages
         messages = data.messages;
         loadMessages();
@@ -712,214 +979,106 @@ function validateAndImportJSON() {
         // Scroll to messages section
         document.querySelector('#messagesContainer').scrollIntoView({ behavior: 'smooth' });
 
-        // Auto-save to update Remotion (if enabled)
-        if (document.getElementById('autoSave')?.checked) {
-            setTimeout(() => {
-                autoSaveAndConfigure('Import JSON terminé');
-            }, 1000);
-        }
+        // Auto-save to update Remotion (always enabled now)
+        setTimeout(() => {
+            autoSaveAndConfigure('Import JSON terminé');
+        }, 1000);
 
     } catch (error) {
         showNotification(`Erreur JSON : ${error.message}`, 'error');
     }
 }
 
-// Enhanced AI generation with modal data
-async function generateWithAIFromModal() {
-    const button = event.target;
-    const loading = button.querySelector('.loading');
-    const span = button.querySelector('span');
-
-    if (loading) loading.classList.add('show');
-    button.disabled = true;
-
-    try {
-        const prompt = document.getElementById('aiPrompt').value.trim();
-        const tone = document.getElementById('aiTone').value;
-        const length = document.getElementById('aiLength').value;
-
-        if (!prompt) {
-            throw new Error('Décrivez votre idée pour la génération IA');
-        }
-
-        // Call the real OpenAI API via our server
-        console.log('🤖 Appel de l\'API OpenAI...');
-        const response = await fetch('/api/generate-ai', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
+// Load example conversation in the modal textarea
+function loadExampleInModal() {
+    const exampleJSON = {
+        "botName": "Tom",
+        "gender": "male",
+        "hook": "POV : Il m'a dit que c'était \"juste une collègue\"…",
+        "CTA": "Je fais quoi ?\nAidez moi !",
+        "messages": [
+            {
+                "sender": "user",
+                "text": "C'est qui Jennifer ?"
             },
-            body: JSON.stringify({
-                prompt: prompt,
-                tone: tone,
-                length: length
-            })
-        });
-
-        const result = await response.json();
-
-        if (!result.success) {
-            throw new Error(result.error || 'Erreur lors de la génération IA');
-        }
-
-        const generatedConversation = result.conversation;
-
-        // Fill form with generated data
-        document.getElementById('botName').value = generatedConversation.botName;
-        document.getElementById('botGender').value = generatedConversation.gender;
-        document.getElementById('hook').value = generatedConversation.hook;
-        document.getElementById('cta').value = generatedConversation.CTA;
-
-        // Clear existing messages and load new ones
-        messages = generatedConversation.messages;
-        loadMessages();
-
-        closeAIModal();
-
-        let successMessage = 'Conversation générée par IA avec succès !';
-        if (result.fallback) {
-            successMessage += ' (Mode de secours utilisé)';
-        }
-        showNotification(successMessage, 'success');
-
-        // Scroll to messages section
-        document.querySelector('#messagesContainer').scrollIntoView({ behavior: 'smooth' });
-
-        // Auto-save to update Remotion (if enabled)
-        if (document.getElementById('autoSave')?.checked) {
-            setTimeout(() => {
-                autoSaveAndConfigure('Génération IA terminée');
-            }, 1000);
-        }
-
-    } catch (error) {
-        console.error('Erreur génération IA:', error);
-        showNotification(`Erreur: ${error.message}`, 'error');
-    } finally {
-        if (loading) loading.classList.remove('show');
-        button.disabled = false;
-    }
-}
-
-function generateAdvancedConversation(prompt, tone, length) {
-    const names = ['Alex', 'Sarah', 'Tom', 'Emma', 'Lucas', 'Chloé', 'Maxime', 'Léa', 'Nathan', 'Manon'];
-    const randomName = names[Math.floor(Math.random() * names.length)];
-    const randomGender = Math.random() > 0.5 ? 'male' : 'female';
-
-    // Message count based on length
-    const messageCounts = {
-        'short': 4 + Math.floor(Math.random() * 3), // 4-6
-        'medium': 6 + Math.floor(Math.random() * 5), // 6-10
-        'long': 10 + Math.floor(Math.random() * 6) // 10-15
-    };
-    const targetCount = messageCounts[length] || 6;
-
-    // Generate conversation based on tone and prompt
-    const templates = {
-        'drama': {
-            hook: `POV : ${randomName} me fait un drame...`,
-            starters: ["Tu me déçois vraiment", "J'en ai marre de tes mensonges", "On doit parler sérieusement"],
-            responses: ["Qu'est-ce qui te prend ?", "Tu dramatises encore", "Calme-toi un peu"],
-            escalations: ["Tu ne comprends rien", "C'est toujours pareil avec toi", "Je suis fatigue(e) de ça"]
-        },
-        'jealousy': {
-            hook: `POV : ${randomName} est jaloux/jalouse...`,
-            starters: ["Tu étais avec qui hier ?", "C'est qui cette personne ?", "Tu me caches quelque chose"],
-            responses: ["Pourquoi tu poses cette question ?", "Tu es encore en train de douter", "C'est de la jalousie maladive"],
-            escalations: ["Je t'ai vu avec...", "Arrête de me mentir", "Dis-moi la vérité"]
-        },
-        'betrayal': {
-            hook: `POV : ${randomName} me trahit...`,
-            starters: ["J'ai découvert ton secret", "Tout le monde le savait sauf moi", "Tu m'as menti pendant des mois"],
-            responses: ["De quoi tu parles ?", "Ce n'est pas ce que tu crois", "Laisse-moi t'expliquer"],
-            escalations: ["J'ai les preuves", "Ne me prends pas pour un(e) idiot(e)", "C'est fini entre nous"]
-        },
-        'toxic': {
-            hook: `POV : ${randomName} montre son vrai visage...`,
-            starters: ["Tu ne fais jamais rien de bien", "Tes amis ne m'aiment pas", "Tu changes depuis quelque temps"],
-            responses: ["Qu'est-ce que j'ai fait ?", "Tu exagères", "Mes amis n'ont rien à voir"],
-            escalations: ["Tu ne me mérites pas", "Je perds mon temps avec toi", "Tu me déçois énormément"]
-        },
-        'suspense': {
-            hook: `POV : ${randomName} cache quelque chose...`,
-            starters: ["Il faut qu'on parle", "J'ai quelque chose à te dire", "Tu vas être surprise(e)"],
-            responses: ["Qu'est-ce qui se passe ?", "Tu m'inquiètes", "Dis-moi maintenant"],
-            escalations: ["Ce n'est pas facile à dire", "Tu vas mal le prendre", "Promets-moi de rester calme"]
-        },
-        'humor': {
-            hook: `POV : ${randomName} me fait encore rire...`,
-            starters: ["Tu as vu ce qui s'est passé ?", "J'ai encore fait une bêtise", "devine ce qui m'arrive"],
-            responses: ["Qu'est-ce que tu as fait encore ?", "Oh non pas encore", "Raconte-moi tout"],
-            escalations: ["C'est pire que tu penses", "Tu vas pas me croire", "J'ai honte de moi"]
-        }
+            {
+                "sender": "bot",
+                "text": "Tu parles de Jenny ? Ma collègue ?"
+            },
+            {
+                "sender": "user",
+                "text": "Ah ouais, une \"collègue\"…"
+            },
+            {
+                "sender": "bot",
+                "text": "Bah ouais\nPourquoi ?"
+            },
+            {
+                "sender": "user",
+                "text": "Donc c'est JUSTE une collègue ?"
+            },
+            {
+                "sender": "bot",
+                "text": "Att, t'es jalouse ?"
+            },
+            {
+                "sender": "user",
+                "text": "non\nnon"
+            },
+            {
+                "sender": "bot",
+                "text": "Tu peux me le dire si t'es jalouse hein"
+            },
+            {
+                "sender": "user",
+                "text": "jsp\nnon"
+            },
+            {
+                "sender": "bot",
+                "text": "T'es *sûre* sûre ?\nUn tout petit peu ?"
+            },
+            {
+                "sender": "user",
+                "text": "J'AI DÉJÀ DIT NON"
+            },
+            {
+                "sender": "bot",
+                "text": "Ok ok chill\nJ'aimerais te faire un bisou là"
+            },
+            {
+                "sender": "user",
+                "text": "VA DEMANDER À JENNY\nTA \"COLLÈGUE\"\nQUI LIKE TOUS TES POSTS 😐"
+            }
+        ]
     };
 
-    const template = templates[tone] || templates['drama'];
-    const messages = [];
+    // Format JSON with proper indentation and insert into textarea
+    const formattedJSON = JSON.stringify(exampleJSON, null, 2);
+    document.getElementById('jsonInput').value = formattedJSON;
 
-    // Start with a starter message
-    messages.push({
-        sender: "user",
-        text: template.starters[Math.floor(Math.random() * template.starters.length)]
-    });
-
-    // Alternate responses
-    let currentSender = "bot";
-    for (let i = 1; i < targetCount; i++) {
-        let text;
-        if (i < targetCount / 2) {
-            text = template.responses[Math.floor(Math.random() * template.responses.length)];
-        } else {
-            text = template.escalations[Math.floor(Math.random() * template.escalations.length)];
-        }
-
-        messages.push({
-            sender: currentSender,
-            text: text
-        });
-
-        currentSender = currentSender === "user" ? "bot" : "user";
-    }
-
-    return {
-        botName: randomName,
-        gender: randomGender,
-        hook: template.hook,
-        CTA: "Vous en pensez quoi ?\nDites-moi en commentaire !",
-        messages: messages
-    };
+    showNotification('✅ Exemple chargé !', 'success');
 }
 
-// Quick generate function for template buttons
-function quickGenerate(topic) {
-    document.getElementById('aiPrompt').value = `Créez une conversation sur le thème : ${topic}. Rendez-la engageante avec des tensions et un final qui donne envie de commenter.`;
-    document.getElementById('aiTone').value = topic.includes('toxique') ? 'toxic' : 'drama';
-    document.getElementById('aiLength').value = 'medium';
-    openAIModal();
-}
-
-// Auto-save function for import and AI generation
-async function autoSaveAndConfigure(source = 'Auto-save') {
+// Auto-save function (simplified version of saveAndConfigure)
+async function autoSaveAndConfigure(reason = 'Auto-save') {
     try {
-        console.log(`🔄 ${source} - Sauvegarde automatique...`);
-        
         const conversationData = getConversationData();
 
         if (conversationData.messages.length === 0) {
-            console.warn('Aucun message à sauvegarder');
+            console.log('Pas de messages à sauvegarder automatiquement');
             return;
         }
 
-        // Get video settings with defaults
+        // Get video settings
         const videoSettings = {
-            darkTheme: document.getElementById('darkTheme')?.value === 'true' || false,
-            messageDuration: parseInt(document.getElementById('messageDuration')?.value) || 3000,
-            initialDelay: parseInt(document.getElementById('initialDelay')?.value) || 2000,
-            showTypingInputBar: document.getElementById('showTypingBar')?.checked || true,
+            darkTheme: document.getElementById('darkTheme').value === 'true',
+            messageDuration: parseInt(document.getElementById('messageDuration').value),
+            initialDelay: parseInt(document.getElementById('initialDelay').value),
+            showTypingInputBar: document.getElementById('showTypingBar').checked,
             enableAudioGeneration: document.getElementById('enableAudio')?.checked || false
         };
 
-        // Save conversation and update code
+        // Save conversation and update code silently
         const response = await fetch('/api/save-and-configure', {
             method: 'POST',
             headers: {
@@ -934,15 +1093,117 @@ async function autoSaveAndConfigure(source = 'Auto-save') {
         const result = await response.json();
 
         if (result.success) {
-            showNotification(`✅ ${source} - Configuration mise à jour automatiquement !`, 'success');
-            console.log(`✅ ${source} - Fichier créé:`, result.filename);
+            console.log(`✅ ${reason} - Configuration sauvegardée automatiquement`);
         } else {
-            throw new Error(result.error || 'Erreur lors de la sauvegarde automatique');
+            console.error(`Erreur auto-save: ${result.error}`);
         }
 
     } catch (error) {
-        console.error(`❌ Erreur ${source}:`, error);
-        showNotification(`⚠️ ${source} - Erreur de sauvegarde: ${error.message}`, 'error');
+        console.error(`Erreur auto-save: ${error.message}`);
+    }
+}
+
+// Show AI generation spinner
+function showAISpinner() {
+    const spinner = document.getElementById('aiSpinner');
+    if (spinner) {
+        spinner.classList.add('show');
+    }
+}
+
+// Hide AI generation spinner
+function hideAISpinner() {
+    const spinner = document.getElementById('aiSpinner');
+    if (spinner) {
+        spinner.classList.remove('show');
+    }
+}
+
+// Generate conversation with AI from modal
+async function generateWithAIFromModal() {
+    const button = event.target.closest('button');
+    const loading = button.querySelector('.loading');
+    const span = button.querySelector('span');
+
+    // Get form values
+    const prompt = document.getElementById('aiPrompt').value.trim();
+    const tone = document.getElementById('aiTone')?.value || 'dramatique';
+    const length = document.getElementById('aiLength')?.value || 'moyen';
+
+    if (!prompt) {
+        showNotification('Veuillez entrer une description de votre idée', 'error');
+        return;
+    }
+
+    if (loading) loading.classList.add('show');
+    button.disabled = true;
+
+    try {
+        // Close modal and show spinner
+        closeAIModal();
+        showAISpinner();
+
+        // Call AI generation API
+        const response = await fetch('/api/generate-ai', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                prompt,
+                tone,
+                length
+            })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            const conversation = result.conversation;
+
+            // Import the generated data
+            document.getElementById('botName').value = conversation.botName || 'Contact';
+            document.getElementById('botGender').value = conversation.gender || 'male';
+            document.getElementById('hook').value = conversation.hook || '';
+            document.getElementById('cta').value = conversation.CTA || '';
+
+            // Trigger change events manually to ensure listeners are fired
+            const botNameEvent = new Event('change', { bubbles: true });
+            const botGenderEvent = new Event('change', { bubbles: true });
+            document.getElementById('botName').dispatchEvent(botNameEvent);
+            document.getElementById('botGender').dispatchEvent(botGenderEvent);
+
+            // Update contact name display
+            setTimeout(() => {
+                updateContactNameDisplay();
+            }, 100);
+
+            // Load messages
+            messages = conversation.messages || [];
+            loadMessages();
+
+            hideAISpinner();
+            showNotification(`✅ Conversation générée avec succès ! ${result.fallback ? '(Mode de secours utilisé)' : ''}`, 'success');
+
+            // Scroll to messages section
+            document.querySelector('#messagesContainer').scrollIntoView({ behavior: 'smooth' });
+
+            // Auto-save to update Remotion
+            setTimeout(() => {
+                autoSaveAndConfigure('Génération IA terminée');
+            }, 1000);
+
+        } else {
+            throw new Error(result.error || 'Erreur lors de la génération IA');
+        }
+
+    } catch (error) {
+        hideAISpinner();
+        showNotification(`Erreur IA: ${error.message}`, 'error');
+        openAIModal(); // Reopen modal on error
+    } finally {
+        if (loading) loading.classList.remove('show');
+        button.disabled = false;
     }
 }
 

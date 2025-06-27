@@ -4,7 +4,7 @@ import { z } from "zod";
 import { Background } from "./components/background";
 import { Bubble } from "./components/bubble";
 import { TypingIndicator } from "./components/TypingIndicator";
-import conversation from "../public/conversations/conversation-1751025199000.json"; // Import JSON file
+import conversation from "../public/conversations/conversation-main.json"; // Import JSON file
 import { useCurrentFrame, interpolate } from "remotion";
 // import reference from "../public/Stock/references/test-reference-imessage.png"; // Import image
 import reference from "../public/Stock/references/input bar full.png"; // Import image
@@ -31,8 +31,8 @@ const framesPerChar = 3; // How many frames each character takes to type (lower 
 const typingDelayFrames = 2; // Delay between key presses (in frames)
 const typingIndicatorDuration = 30; // Duration to show typing indicator before message appears
 
-const darkTheme = true; // Toggle dark theme
-const showTypingInputBar = true; // Toggle typing/message input bar visibility
+const darkTheme = false; // Toggle dark theme
+const showTypingInputBar = false; // Toggle typing/message input bar visibility
 
 const enableAudioGeneration = false; // Toggle to enable/disable audio generation
 

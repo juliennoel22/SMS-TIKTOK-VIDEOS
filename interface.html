@@ -137,6 +137,106 @@
                 opacity: 0.5;
             }
         }
+
+        /* Message colors for different senders */
+        .message-user {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            border-left: 4px solid #1d4ed8;
+        }
+
+        .message-bot {
+            background: linear-gradient(135deg, #e5e7eb 0%, #9ca3af 100%);
+            border-left: 4px solid #6b7280;
+        }
+
+        .message-sender-label {
+            color: white;
+            font-weight: 600;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Spinner for AI generation */
+        .ai-spinner {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        .ai-spinner.show {
+            display: block;
+        }
+
+        .spinner-wheel {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f4f6;
+            border-top: 5px solid #8b5cf6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Enhanced modal styles */
+        .modal-content {
+            max-width: 95vw;
+            max-height: calc(100vh - 40px);
+            width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            overflow-y: auto;
+        }
+
+        .modal-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* Only apply centering when modals are actually displayed */
+        #importModal[style*="flex"] .modal-container,
+        #aiModal[style*="flex"] .modal-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 9999;
+        }
+
+        /* Fix text color for user role options */
+        .message-user .sender-select option,
+        .message-user .sender-select {
+            color: #1f2937 !important;
+            background: white !important;
+        }
+
+        .message-bot .sender-select option,
+        .message-bot .sender-select {
+            color: #1f2937 !important;
+            background: white !important;
+        }
     </style>
 </head>
 
@@ -235,7 +335,7 @@
                         </label>
                         <select id="botGender"
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            <option value="male">Masculin</option>
+                            <option value="male" selected>Masculin</option>
                             <option value="female">Féminin</option>
                         </select>
                     </div>
@@ -258,26 +358,27 @@
                     </label>
                     <textarea id="cta" rows="3"
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="Je fais quoi ? Aidez moi !">Je fais quoi ?\nAidez moi !</textarea>
+                        placeholder="Je fais quoi ? Aidez moi !">Je fais quoi ?
+Aidez moi !</textarea>
                 </div>
             </div>
 
             <!-- Messages -->
             <div class="form-section fade-in">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-bold text-gray-800">
-                        <i class="fas fa-comments mr-2 text-green-600"></i>
-                        Messages de la conversation
-                    </h2>
-                    <button onclick="addMessage()" class="btn-primary">
-                        <i class="fas fa-plus mr-2"></i>
-                        Ajouter un message
-                    </button>
-                </div>
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">
+                    <i class="fas fa-comments mr-2 text-green-600"></i>
+                    Messages de la conversation
+                </h2>
 
-                <div id="messagesContainer" class="space-y-4">
+
+                <div id="messagesContainer" class="space-y-4 mb-6">
                     <!-- Messages seront générés ici -->
                 </div>
+
+                <button onclick="addMessage()" class="btn-primary">
+                    <i class="fas fa-plus mr-2"></i>
+                    Ajouter un message
+                </button>
             </div>
 
             <!-- Video Settings -->
@@ -323,7 +424,7 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                     <div class="flex items-center">
-                        <input type="checkbox" id="showTypingBar" checked
+                        <input type="checkbox" id="showTypingBar"
                             class="mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                         <label class="text-sm font-medium text-gray-700">
                             <i class="fas fa-keyboard mr-1"></i>
@@ -331,28 +432,14 @@
                         </label>
                     </div>
 
-                    <div class="flex items-center">
+                    <!-- <div class="flex items-center">
                         <input type="checkbox" id="enableAudio"
                             class="mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                         <label class="text-sm font-medium text-gray-700">
                             <i class="fas fa-volume-up mr-1"></i>
                             Activer la génération audio
                         </label>
-                    </div>
-                </div>
-
-                <div class="mt-6">
-                    <div class="flex items-center">
-                        <input type="checkbox" id="autoSave" checked
-                            class="mr-3 h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
-                        <label class="text-sm font-medium text-gray-700">
-                            <i class="fas fa-save mr-1"></i>
-                            Sauvegarde automatique après import/génération IA
-                        </label>
-                    </div>
-                    <p class="text-xs text-gray-500 mt-1 ml-7">
-                        Met à jour automatiquement la configuration Remotion après l'import JSON ou la génération IA
-                    </p>
+                    </div> -->
                 </div>
             </div>
 
@@ -363,10 +450,19 @@
                     Actions
                 </h2>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <button onclick="saveAndConfigure()" class="btn-primary w-full">
                         <i class="fas fa-save mr-2"></i>
-                        <span>Sauvegarder & Configurer</span>
+                        <span>Sauvegarder</span>
+                        <div class="loading ml-2">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </div>
+                    </button>
+
+                    <button onclick="renderVideo()" class="btn-primary w-full"
+                        style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                        <i class="fas fa-video mr-2"></i>
+                        <span>Faire le rendu</span>
                         <div class="loading ml-2">
                             <i class="fas fa-spinner fa-spin"></i>
                         </div>
@@ -381,19 +477,6 @@
                         </div>
                     </button>
                 </div>
-
-                <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                    <div class="flex items-center mb-2">
-                        <i class="fas fa-info-circle text-blue-600 mr-2"></i>
-                        <span class="font-semibold text-blue-800">Workflow de création</span>
-                    </div>
-                    <ol class="text-sm text-blue-700 list-decimal list-inside space-y-1">
-                        <li>Configurez votre conversation et paramètres ici</li>
-                        <li>Cliquez sur "Sauvegarder & Configurer" pour appliquer les changements</li>
-                        <li>Ouvrez Remotion Studio pour prévisualiser et rendre la vidéo</li>
-                        <li>Générez l'audio si nécessaire avec <code>npm run gen-audio</code> dans le terminal</li>
-                    </ol>
-                </div>
             </div>
 
         </div>
@@ -403,8 +486,8 @@
 
     <!-- Import JSON Modal -->
     <div id="importModal" class="fixed inset-0 bg-black bg-opacity-50 z-50" style="display: none;">
-        <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="bg-white rounded-lg p-8 max-w-4xl w-full max-h-90vh overflow-y-auto">
+        <div class="modal-container">
+            <div class="bg-white rounded-lg p-8 modal-content overflow-y-auto">
                 <div class="flex justify-between items-center mb-6">
                     <h3 class="text-2xl font-bold text-gray-800">
                         <i class="fas fa-file-import mr-2 text-blue-600"></i>
@@ -420,7 +503,7 @@
                         <label class="block text-sm font-medium text-gray-700 mb-2">
                             Collez votre script JSON ici :
                         </label>
-                        <textarea id="jsonInput" rows="15"
+                        <textarea id="jsonInput" rows="20"
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
                             placeholder='Exemple :
 {
@@ -429,6 +512,14 @@
   "hook": "POV : Il m\' a dit que c\'était juste une collègue...", "CTA" : "Je fais quoi ?\\nAidez moi !" , "messages"
                             : [ { "sender" : "user" , "text" : "C\'est qui Jennifer ?" }, { "sender" : "bot" , "text"
                             : "Tu parles de Jenny ? Ma collègue ?" } ] }'></textarea>
+                    </div>
+
+                    <!-- Load example button -->
+                    <div class="flex justify-center">
+                        <button onclick="loadExampleInModal()" class="btn-secondary">
+                            <i class="fas fa-file-alt mr-2"></i>
+                            Charger l'exemple dans le champ
+                        </button>
                     </div>
 
                     <div class="flex justify-between">
@@ -447,8 +538,8 @@
 
     <!-- AI Generation Modal -->
     <div id="aiModal" class="fixed inset-0 bg-black bg-opacity-50 z-50" style="display: none;">
-        <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="bg-white rounded-lg p-8 max-w-2xl w-full">
+        <div class="modal-container">
+            <div class="bg-white rounded-lg p-8 modal-content overflow-y-auto">
                 <div class="flex justify-between items-center mb-6">
                     <h3 class="text-2xl font-bold text-gray-800">
                         <i class="fas fa-magic mr-2 text-purple-600"></i>
@@ -484,12 +575,13 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Longueur</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Longueur de la vidéo</label>
                             <select id="aiLength"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                                <option value="short">Court (4-6 messages)</option>
-                                <option value="medium">Moyen (6-10 messages)</option>
-                                <option value="long">Long (10-15 messages)</option>
+                                <option value="15s">Court (~15 secondes - 6-8 messages)</option>
+                                <option value="30s">Moyen (~30 secondes - 12-15 messages)</option>
+                                <option value="45s">Long (~45 secondes - 18-23 messages)</option>
+                                <option value="+65s">Très long (~1 minute - +32 messages)</option>
                             </select>
                         </div>
                     </div>
@@ -504,6 +596,7 @@
                             <li>Mentionnez le type de révélation ou twist souhaité</li>
                             <li>Précisez si vous voulez une fin ouverte ou fermée</li>
                             <li>Indiquez les personnages (âge, relation, contexte)</li>
+                            <li><strong>Durée :</strong> Chaque message dure ~2 secondes en moyenne</li>
                         </ul>
                     </div>
 
@@ -523,6 +616,18 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- AI Generation Spinner -->
+    <div id="aiSpinner" class="ai-spinner">
+        <div class="spinner-wheel"></div>
+        <h3 class="text-lg font-semibold text-gray-800 mb-2">
+            <i class="fas fa-magic mr-2 text-purple-600"></i>
+            Génération en cours...
+        </h3>
+        <p class="text-sm text-gray-600">
+            L'IA crée votre conversation, veuillez patienter...
+        </p>
     </div>
 
     <script src="script.js"></script>

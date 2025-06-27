@@ -14,4 +14,4 @@ out
 *.csv
 /videos_export
 /videos
-*/conversations/*.json
+# */conversations/*.json

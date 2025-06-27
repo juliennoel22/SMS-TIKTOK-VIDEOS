@@ -4,7 +4,7 @@ const path = require("path");
 const os = require("os");
 const { exec } = require("child_process");
 
-const conversationPath = path.join(__dirname, "../public/conversations/conv1.json");
+const conversationPath = path.join(__dirname, "../public/conversations/conversation-main.json");
 const outputDir = path.join(__dirname, "../public/audio");
 
 if (!fs.existsSync(outputDir)) {
