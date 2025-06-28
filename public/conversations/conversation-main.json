@@ -1,80 +1,68 @@
 {
-  "botName": "Guillaume",
-  "gender": "male",
-  "hook": "POV : Tu débarques en \nTurquie et tout déraille.",
+  "botName": "Alicia",
+  "gender": "female",
+  "hook": "POV : T'es sur le point de partir en vacances ...",
   "CTA": "Je fais quoi ?\nAidez moi !",
   "messages": [
     {
       "sender": "user",
-      "text": "Guillaume, t'as deux minutes ?"
+      "text": "J'ai trop hâte pour ces vacances !"
     },
     {
       "sender": "bot",
-      "text": "Ouais, t'es où ?"
+      "text": "Grave, ça va être dingue !"
     },
     {
       "sender": "user",
-      "text": "En Turquie, mais y'a un souci."
+      "text": "Attends... t'as pris les billets, hein ?"
     },
     {
       "sender": "bot",
-      "text": "Quoi ? T'es sérieux ?"
+      "text": "Euh, non... c'était toi !"
     },
     {
       "sender": "user",
-      "text": "J'ai perdu mon passeport."
+      "text": "Quoi ?! T'es sérieux ?"
     },
     {
       "sender": "bot",
-      "text": "Attends, comment ça ?"
+      "text": "J'pensais que c'était clair..."
     },
     {
       "sender": "user",
-      "text": "Il était dans ma poche... maintenant disparu."
+      "text": "Franchement, c'est une blague ?"
     },
     {
       "sender": "bot",
-      "text": "T'as vérifié partout ?"
+      "text": "Mais... j'ai déjà fait les valises !"
     },
     {
       "sender": "user",
-      "text": "Ouais, rien. Même pas une trace."
+      "text": "On va où sans billets, génie ?!"
     },
     {
       "sender": "bot",
-      "text": "C'est chaud, tu fais quoi là ?"
+      "text": "Jsp, j'panique là !"
     },
     {
       "sender": "user",
-      "text": "Je sais pas... je flippe grave."
+      "text": "Et maintenant ?"
     },
     {
       "sender": "bot",
-      "text": "Contacte l'ambassade direct !"
+      "text": "On improvise ?"
     },
     {
       "sender": "user",
-      "text": "Et si quelqu'un l'utilise ?"
+      "text": "C'est mort, on a tout perdu..."
     },
     {
       "sender": "bot",
-      "text": "T'inquiète, appelle vite. C'est urgent."
+      "text": "On est dans la m... là, non ?"
     },
     {
       "sender": "user",
-      "text": "Je fais quoi si ça tourne mal ?"
-    },
-    {
-      "sender": "bot",
-      "text": "Reste calme, je suis là. On gère."
-    },
-    {
-      "sender": "user",
-      "text": "J'espère... tout peut basculer."
-    },
-    {
-      "sender": "bot",
-      "text": "On s'en sortira, promis."
+      "text": "Je fais quoi ?\nAidez moi !"
     }
   ]
 }

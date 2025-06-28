@@ -27,11 +27,8 @@ Ce projet permet de générer automatiquement des vidéos d'échanges iMessages 
 2. **Installer Git**  
    Téléchargez depuis [git-scm.com](https://git-scm.com/)
 
-3. **Installer Python** (pour l'audio - optionnel)  
-   Téléchargez depuis [python.org](https://python.org/) et installez :
-   ```bash
-   pip install gtts pydub
-   ```
+3. **Installer VS Code** (recommandé)  
+   Téléchargez depuis [code.visualstudio.com](https://code.visualstudio.com/)
 
 ### Installation
 
@@ -46,24 +43,36 @@ Ce projet permet de générer automatiquement des vidéos d'échanges iMessages 
    npm install
    ```
 
-3. **Configuration IA (optionnel)**
+3. **Configuration IA**
    
-   Créez un fichier `.env` dans le dossier racine :
+   Renommez le fichier `.env.example` en `.env` dans le dossier racine :
    ```env
    OPENAI_API_KEY=votre_clé_api_openai
    ```
+   > 👉 Envoie moi un message pour que je te donne une clé API !
 
 ## 🎬 Comment générer une vidéo
 
-### Méthode 1 : Interface Web (Recommandée)
+### Méthode 1 : Interface Web
+
+> 💡 **Comment ouvrir un terminal :**
+> - **Windows** : Appuyez sur `Win + R`, tapez `cmd` ou `powershell`, puis `Entrée`
+> - **macOS** : Appuyez sur `Cmd + Espace`, tapez `terminal`, puis `Entrée`
+> - **VS Code** : Menu `Terminal` → `Nouveau terminal` ou `Ctrl + ù`
 
 1. **Démarrer l'interface**
    ```bash
    npm start
    ```
-   L'interface s'ouvre automatiquement sur `http://localhost:3001/interface.html`
+   
+2. **Démarrer Remotion (dans un nouveau terminal)**
+   ```bash
+   npm run dev
+   ```
+   
+   L'interface sera accessible sur l'adresse `http://localhost:3001/interface.html`
 
-2. **Créer votre conversation**
+3. **Créer votre conversation**
    
    **🎯 Démarrage rapide (3 options disponibles) :**
    
@@ -111,69 +120,6 @@ Ce projet permet de générer automatiquement des vidéos d'échanges iMessages 
 
    **⏱️ Temps de rendu :** Comptez environ 30 secondes à 2 minutes selon la longueur de votre conversation.
 
-### Méthode 2 : Ligne de commande (Avancée)
-
-Si vous préférez travailler directement avec les fichiers JSON ou intégrer la génération dans vos propres scripts :
-
-1. **Créer votre conversation JSON**
-   
-   Créez un fichier dans `public/conversations/conversation-main.json` :
-   ```json
-   {
-     "botName": "Tom",
-     "gender": "male",
-     "hook": "POV : Il m'a dit que c'était juste une collègue...",
-     "CTA": "Je fais quoi ?\nAidez moi !",
-     "messages": [
-       {
-         "sender": "user",
-         "text": "C'est qui Jennifer ?"
-       },
-       {
-         "sender": "bot", 
-         "text": "Tu parles de Jenny ? Ma collègue ?"
-       },
-       {
-         "sender": "user",
-         "text": "Ah ouais, une \"collègue\"..."
-       },
-       {
-         "sender": "bot",
-         "text": "Bah ouais\nPourquoi ?"
-       }
-     ]
-   }
-   ```
-
-2. **Générer l'audio (optionnel)**
-   ```bash
-   npm run gen-audio
-   ```
-   Cette commande génère les fichiers audio TTS pour chaque message dans `public/audio/`
-
-3. **Prévisualiser avec Remotion Studio**
-   ```bash
-   npm run dev
-   ```
-   Ouvrez `http://localhost:3000` pour prévisualiser votre vidéo
-
-4. **Rendre la vidéo finale**
-   ```bash
-   npx remotion render Sms out/ma-video.mp4
-   ```
-   
-   **Options de rendu avancées :**
-   ```bash
-   # Rendu avec qualité personnalisée
-   npx remotion render Sms out/video.mp4 --jpeg-quality=90
-   
-   # Rendu avec parallélisation
-   npx remotion render Sms out/video.mp4 --concurrency=4
-   
-   # Rendu d'une portion spécifique
-   npx remotion render Sms out/extrait.mp4 --frames=0-150
-   ```
-
 ## ⚙️ Paramètres et personnalisation
 
 ### Interface Web
@@ -191,38 +137,6 @@ L'interface web permet de configurer tous les aspects de votre vidéo :
 - **Durée des messages** : Temps d'affichage de chaque message (en frames)
 - **Délai initial** : Pause avant le premier message
 - **Barre de saisie** : Afficher ou masquer la zone de texte
-
-**Paramètres audio :**
-- **Génération audio** : Activer/désactiver la synthèse vocale
-- **Voix utilisateur/bot** : Genre des voix générées
-
-### Génération IA
-
-Pour utiliser la génération automatique de conversations :
-
-1. **Configurer OpenAI** (obligatoire)
-   
-   Créez un compte sur [OpenAI](https://platform.openai.com/) et obtenez une clé API
-   
-   Ajoutez votre clé dans le fichier `.env` :
-   ```env
-   OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-   ```
-
-2. **Utiliser le générateur**
-   
-   - Cliquez sur "Générer avec IA" dans l'interface
-   - Décrivez votre scénario (ex: "Une dispute de couple sur la jalousie")
-   - Choisissez la durée souhaitée
-   - L'IA génère automatiquement une conversation dramatique
-
-3. **Prompts efficaces**
-   
-   Pour de meilleurs résultats, incluez :
-   - Le contexte (couple, amis, famille)
-   - L'émotion recherchée (jalousie, colère, surprise)
-   - Le type de révélation ou twist
-   - L'âge approximatif des personnages
 
 ## 📁 Structure du projet
 
@@ -244,81 +158,6 @@ Pour utiliser la génération automatique de conversations :
     └── generate_single_audio.py # Script Python TTS
 ```
 
-## 🛠️ Dépannage
-
-### Problèmes courants
-
-**❌ "Uncaught ReferenceError: autoSaveAndConfigure is not defined"**
-- Ce problème a été corrigé automatiquement
-- Redémarrez le serveur : `npm start`
-- Actualisez votre navigateur (Ctrl+F5)
-
-**❌ "Uncaught ReferenceError: generateWithAIFromModal is not defined"**
-- Ce problème a été corrigé automatiquement
-- Actualisez votre navigateur pour charger les nouvelles fonctions
-
-**❌ "IA non disponible"**
-- Vérifiez que votre clé OpenAI est correcte dans `.env`
-- Assurez-vous d'avoir des crédits sur votre compte OpenAI
-- Redémarrez le serveur après avoir ajouté la clé : `npm start`
-
-**❌ Erreur audio "gtts not found"**
-- Installez Python : `python --version` doit fonctionner
-- Installez les dépendances : `pip install gtts pydub`
-- Sur Windows, ajoutez Python au PATH
-
-**❌ Erreur "ffmpeg not found"**
-- Téléchargez ffmpeg depuis [ffmpeg.org](https://ffmpeg.org/download.html)
-- Ajoutez ffmpeg au PATH système
-- Redémarrez le terminal
-
-**❌ Port 3001 déjà utilisé**
-- Arrêtez les autres serveurs Node.js : `Ctrl+C` dans tous les terminaux
-- Ou modifiez le port dans `server.js` ligne 14
-- Utilisez `netstat -aon | findstr :3001` pour identifier le processus
-
-**❌ Rendu vidéo échoue**
-- Vérifiez que la conversation a au moins 1 message
-- Assurez-vous d'avoir assez d'espace disque (minimum 500MB)
-- Essayez de désactiver l'audio si problème
-- Fermez Remotion Studio avant le rendu
-
-**❌ La vidéo ne se lit pas**
-- Vérifiez le dossier `out/` pour le fichier MP4
-- Essayez un autre lecteur vidéo (VLC, Windows Media Player)
-- Le rendu peut prendre plusieurs minutes selon la longueur
-
-### Performance
-
-**🚀 Accélérer le rendu :**
-- Désactivez l'audio si non nécessaire (cases à cocher dans l'interface)
-- Réduisez la qualité JPEG dans `remotion.config.ts`
-- Utilisez un SSD pour un rendu plus rapide
-- Fermez les autres applications pendant le rendu
-
-**💾 Réduire la taille des vidéos :**
-- Diminuez la durée des messages (paramètre "Durée des messages")
-- Utilisez le thème sombre (consomme moins d'espace)
-- Compressez les vidéos avec Handbrake après rendu
-
-**🔧 Optimisation système :**
-- RAM recommandée : 8GB minimum, 16GB idéal
-- CPU : Plus de cœurs = rendu plus rapide
-- Stockage : SSD recommandé pour les performances
-
-## 📋 Commandes utiles
-
-| Commande                                       | Description                             |
-| ---------------------------------------------- | --------------------------------------- |
-| `npm start`                                    | ⭐ Démarrer l'interface web (port 3001)  |
-| `npm run dev`                                  | 🎬 Lancer Remotion Studio (port 3000)    |
-| `npm run gen-audio`                            | 🔊 Générer les fichiers audio TTS        |
-| `npx remotion render Sms out/video.mp4`        | 📹 Rendre une vidéo manuellement         |
-| `npx remotion render Sms out/video.mp4 --help` | 📖 Voir toutes les options de rendu      |
-| `npx remotion upgrade`                         | ⬆️ Mettre à jour Remotion                |
-| `npm run lint`                                 | 🔍 Vérifier le code                      |
-| `npm install`                                  | 📦 Installer/réinstaller les dépendances |
-
 ### Raccourcis clavier dans l'interface
 
 | Raccourci  | Action                      |
@@ -326,20 +165,6 @@ Pour utiliser la génération automatique de conversations :
 | `Ctrl + S` | Sauvegarder la conversation |
 | `Escape`   | Fermer les modals           |
 | `Enter`    | Valider dans les champs     |
-
-### Variables d'environnement (.env)
-
-```env
-# IA (optionnel mais recommandé)
-OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-# Audio avancé (optionnel)
-ELEVENLABS_API_KEY=xxxxxxxxxxxxxxxxxxxxxxxxx
-
-# Configuration serveur (optionnel)
-PORT=3001
-NODE_ENV=development
-```
 
 ## 🎯 Conseils pour créer du contenu viral
 

@@ -4,7 +4,7 @@ import { Sms, myCompSchema3, messageDuration, initialDelay } from "./Sms";
 import { Test } from "./Test";
 import conversation from "../public/conversations/conversation-main.json"; // Import conversation data
 
-// Updated: 1751054295575
+// Updated: 1751098530473
 const typingDuration = 80; // Match the value in Sms.tsx
 const totalMessages = conversation.messages.length;
 // Utilise les valeurs importées pour la durée totale

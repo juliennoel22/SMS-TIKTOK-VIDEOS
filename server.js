@@ -577,9 +577,9 @@ function generateConversationFromTopic(topic) {
 
 // Start server
 app.listen(PORT, () => {
-    console.log(`🚀 Serveur de l'interface web démarré sur http://localhost:${PORT}`);
+    console.log(`🚀 Serveur web démarré sur le port ${PORT}`);
     console.log(`📱 Interface disponible sur http://localhost:${PORT}/interface.html`);
-    console.log(`🎬 Pour démarrer Remotion: npm run dev`);
+    console.log(`🎬 Lancez la comande \`npm run dev\` dans un autre terminal pour démarrer Remotion Studio`);
 });
 
 // Graceful shutdown
