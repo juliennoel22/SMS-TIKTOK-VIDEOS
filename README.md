@@ -381,4 +381,16 @@ Ce projet utilise [Remotion](https://remotion.dev) qui peut nécessiter une lice
 
 *Générateur de vidéos iMessages pour créateurs de contenu*
 
+---
+
+## 📜 Licence et Protection
+
+**© 2025 - Tous droits réservés**
+
+Ce logiciel est protégé par une licence propriétaire. Toute utilisation, copie, modification ou distribution non autorisée est strictement interdite et constitue une violation du droit d'auteur.
+
+**⚠️ AVERTISSEMENT :** Ce code est la propriété exclusive de son auteur. L'utilisation sans autorisation peut entraîner des poursuites judiciaires.
+
+Voir le fichier `LICENSE` pour les conditions complètes.
+
 </div>
